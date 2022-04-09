@@ -23,7 +23,9 @@ $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', function ($api){
     $api->get('hello', function () {
-        return 'Hello Fadergs Comunidad222e';
+        return 'Hello Fadergs Comunidade';
     }); 
 
+
+    
 });
