@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8c9cc64ddb3bde257529cbb8cb8f6798",
+    "content-hash": "7ba2ac540d615bbce03bdc34c3072693",
     "packages": [
         {
             "name": "api-ecosystem-for-laravel/dingo-api",
@@ -206,6 +206,76 @@
                 }
             ],
             "time": "2021-08-15T20:50:18+00:00"
+        },
+        {
+            "name": "canducci/zipcode",
+            "version": "v3.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/netdragoon/zipcode.git",
+                "reference": "7a8ff5a7b8cee544182b68c4d65850e8f408e4bf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/netdragoon/zipcode/zipball/7a8ff5a7b8cee544182b68c4d65850e8f408e4bf",
+                "reference": "7a8ff5a7b8cee544182b68c4d65850e8f408e4bf",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.7",
+                "php-extended/php-simple-cache-filesystem": "^3.1"
+            },
+            "require-dev": {
+                "phpspec/phpspec": "6.1.1",
+                "phpunit/phpunit": "8.5.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Canducci\\ZipCode\\Providers\\ZipCodeServiceProvider",
+                        "Canducci\\ZipCode\\Providers\\ZipCodeAddressServiceProvider"
+                    ],
+                    "aliases": {
+                        "ZipCode": "Canducci\\ZipCode\\Facades\\ZipCode",
+                        "Address": "Canducci\\ZipCode\\Facades\\ZipCodeAddress"
+                    }
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/Canducci/ZipCode/ZipCodeHelper.php",
+                    "src/Canducci/ZipCode/ZipCodeAddressHelper.php"
+                ],
+                "psr-4": {
+                    "Canducci\\ZipCode\\": "src/Canducci/ZipCode/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fúlvio",
+                    "email": "fulviocanducci@hotmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "ZipCode From Brazil",
+            "homepage": "https://github.com/netdragoon/zipcode",
+            "keywords": [
+                "cep",
+                "cep from brazil",
+                "laravel",
+                "zip",
+                "zipcode"
+            ],
+            "support": {
+                "issues": "https://github.com/netdragoon/zipcode/issues",
+                "source": "https://github.com/netdragoon/zipcode/tree/v3.0.6"
+            },
+            "time": "2020-12-15T14:48:36+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -2610,6 +2680,111 @@
                 "source": "https://github.com/opis/closure/tree/3.6.3"
             },
             "time": "2022-01-27T09:35:39+00:00"
+        },
+        {
+            "name": "php-extended/php-simple-cache-filesystem",
+            "version": "3.1.23",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/php-extended/php-simple-cache-filesystem.git",
+                "reference": "10ef2afe15a2d159fe31a34b7c5e0932e5c42b0b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/php-extended%2Fphp-simple-cache-filesystem/repository/archive.zip?sha=10ef2afe15a2d159fe31a34b7c5e0932e5c42b0b",
+                "reference": "10ef2afe15a2d159fe31a34b7c5e0932e5c42b0b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1",
+                "php-extended/polyfill-php80-stringable": ">=1",
+                "psr/simple-cache": "^1"
+            },
+            "provide": {
+                "psr/simple-cache-implementation": "^1"
+            },
+            "require-dev": {
+                "php-extended/placeholder-phpunit": ">=1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "PhpExtended\\SimpleCache\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anastaszor",
+                    "homepage": "https://gitlab.com/Anastaszor",
+                    "role": "developer"
+                }
+            ],
+            "description": "A psr-16 compliant cache that uses filesystems to store cache data.",
+            "homepage": "https://gitlab.com/php-extended/php-simple-cache-filesystem",
+            "keywords": [
+                "Simple",
+                "cache",
+                "filesystem",
+                "php",
+                "psr-16"
+            ],
+            "support": {
+                "issues": "https://gitlab.com/php-extended/php-simple-cache-filesystem/issues",
+                "source": "https://gitlab.com/php-extended/php-simple-cache-filesystem"
+            },
+            "time": "2022-02-20T11:46:58+00:00"
+        },
+        {
+            "name": "php-extended/polyfill-php80-stringable",
+            "version": "1.0.39",
+            "source": {
+                "type": "git",
+                "url": "https://gitlab.com/php-extended/polyfill-php80-stringable.git",
+                "reference": "963eef94ca0c848b2a32dd6bed399c9d0ec4c55c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://gitlab.com/api/v4/projects/php-extended%2Fpolyfill-php80-stringable/repository/archive.zip?sha=963eef94ca0c848b2a32dd6bed399c9d0ec4c55c",
+                "reference": "963eef94ca0c848b2a32dd6bed399c9d0ec4c55c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Anastaszor",
+                    "homepage": "https://gitlab.com/Anastaszor",
+                    "role": "developer"
+                }
+            ],
+            "description": "A polyfill that adds the stringable interface added in php8.0 to previous versions of php",
+            "homepage": "https://gitlab.com/php-extended/polyfill-php80-stringable",
+            "keywords": [
+                "php",
+                "php8",
+                "polyfill",
+                "stringable"
+            ],
+            "support": {
+                "issues": "https://gitlab.com/php-extended/polyfill-php80-stringable/issues",
+                "source": "https://gitlab.com/php-extended/polyfill-php80-stringable"
+            },
+            "time": "2022-02-20T08:55:53+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
