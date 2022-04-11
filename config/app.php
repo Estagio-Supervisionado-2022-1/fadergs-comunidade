@@ -169,6 +169,7 @@ return [
         Canducci\ZipCode\Providers\ZipCodeServiceProvider::class,
         Canducci\ZipCode\Providers\ZipCodeAddressServiceProvider::class,
 
+
         /*
          * Application Service Providers...
          */
@@ -177,6 +178,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Spatie\Permission\PermissionServiceProvider::class,
 
     ],
 
