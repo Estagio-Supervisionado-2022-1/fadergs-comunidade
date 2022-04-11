@@ -15,6 +15,6 @@ class Operator extends Model
     ];
 
     public function addresses () {
-        return $this->hasMany(Address::class, 'id_departament');
+        return $this->hasMany(Address::class, 'departament_id');
     }
 }

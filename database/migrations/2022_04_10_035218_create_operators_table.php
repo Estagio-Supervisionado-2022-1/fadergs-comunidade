@@ -19,11 +19,12 @@ class CreateOperatorsTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->bigInteger('id_departament')->unsigned();
-            $table->foreign('id_departament')->references('id')->on('departaments');
+            $table->bigInteger('departament_id')->unsigned();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('departament_id')->references('id')->on('departaments');
         });
     }
 

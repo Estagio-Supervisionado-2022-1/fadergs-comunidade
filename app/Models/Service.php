@@ -10,7 +10,7 @@ class Service extends Model
     protected $fillable = ['service', 'id_departament'];
 
     public function departaments (){
-        return $this->hasMany(Departament::class, 'id_departament');
+        return $this->hasMany(Departament::class, 'departament_id');
     }
 
 }

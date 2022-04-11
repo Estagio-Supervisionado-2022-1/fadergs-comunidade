@@ -22,10 +22,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', function ($api){
-    $api->get('hello', function () {
+    $api->get('/', function () {
         return 'Hello Fadergs Comunidade';
-    }); 
+    });
 
-
-    
 });
