@@ -1,0 +1,6 @@
+2022/04/03 14:08:38 [error] 32#32: *1 directory index of "/var/www/app.dev/" is forbidden, client: 172.25.0.1, server: localhost, request: "GET / HTTP/1.1", host: "localhost"
+2022/04/03 14:09:11 [error] 32#32: *1 directory index of "/var/www/app.dev/" is forbidden, client: 172.25.0.1, server: localhost, request: "GET / HTTP/1.1", host: "localhost"
+2022/04/03 14:10:16 [error] 31#31: *2 directory index of "/var/www/app.dev/" is forbidden, client: 172.19.0.1, server: localhost, request: "GET / HTTP/1.1", host: "localhost"
+2022/04/03 14:10:17 [error] 31#31: *2 directory index of "/var/www/app.dev/" is forbidden, client: 172.19.0.1, server: localhost, request: "GET / HTTP/1.1", host: "localhost"
+2022/04/03 14:11:35 [error] 31#31: *1 directory index of "/var/www/app.dev/" is forbidden, client: 172.20.0.1, server: localhost, request: "GET / HTTP/1.1", host: "localhost"
+2022/04/03 20:18:34 [error] 32#32: *2 directory index of "/var/www/app.dev/" is forbidden, client: 172.21.0.1, server: localhost, request: "GET / HTTP/1.1", host: "localhost"
