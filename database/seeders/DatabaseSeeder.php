@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             AddressSeeder::class,
             DepartamentSeeder::class,
             UserSeeder::class,
+            RolesAndPermissionsSeeder::class,
             // CONTINUE IN CORRECT ORDER BELOW
 
         ]);
