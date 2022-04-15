@@ -35,8 +35,11 @@ class RolesAndPermissionsSeeder extends Seeder
             ]);
         }
 
+        Role::create(['name' => 'admin'
+        ])->givePermissionTo(Permission::all());
+
         $roles = [
-            'admin','manager','student',
+            'manager','student',
         ];
 
         foreach ($roles as $role){
@@ -44,6 +47,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'name' => $role,
             ]);
         }
+
 
     }
 }
