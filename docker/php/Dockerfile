@@ -58,6 +58,7 @@ WORKDIR ${WORKDIR}
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
+EXPOSE 8000
 
 # Run entrypoint
 COPY ./entrypoint.sh /usr/bin/docker-entrypoint

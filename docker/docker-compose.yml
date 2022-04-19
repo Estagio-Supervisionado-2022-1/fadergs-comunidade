@@ -19,6 +19,7 @@ services:
       - skeleton-docker.network
     ports:
       - "9000:9000"
+      - "8000:8000"
     volumes:
       - ../:/var/www/app.dev
 
