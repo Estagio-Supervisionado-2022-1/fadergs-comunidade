@@ -26,4 +26,6 @@ $api->version('v1', function ($api){
         return 'Hello Fadergs Comunidade';
     });
 
+    $api->post('/operators/signup', 'App\Http\Controllers\OperatorController@store');
+
 });
