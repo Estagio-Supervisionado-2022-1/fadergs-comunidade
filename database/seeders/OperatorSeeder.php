@@ -6,6 +6,7 @@ use App\Models\Operator;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Faker\Factory as Faker;
 
 class OperatorSeeder extends Seeder
 {
@@ -16,16 +17,22 @@ class OperatorSeeder extends Seeder
      */
     public function run()
     {
-        $NUMBER_OF_RECORDS = 50;
+        $NUMBER_OF_RECORDS = 10;
+        $faker = Faker::create();
 
         for ($i = 0; $i < $NUMBER_OF_RECORDS ; $i++){
 
             Operator::insert([
-                'name'              => Str::random(10),
-                'email'             => Str::random(10).'@fadergs.edu.br',
-                'password'          => Hash::make('passoword'),
-                'id_departament'    => random_int(0,9),
+                'name'              => $faker->name,
+                'email'             => $faker->safeEmail,
+                'password'          => bcrypt('Brasil@10a'),
+                'departament_id'    => random_int(1,4),
+                'created_at'        => now(),
+                'updated_at'        => now(),
+
             ]);
         }
-    }
+
+        Operator::find(1)->assignRole('admin');
+}
 }

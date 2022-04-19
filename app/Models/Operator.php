@@ -19,6 +19,10 @@ class Operator extends Authenticatable implements JWTSubject
         'departament_id',
     ];
 
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+
     public function Departament () {
         return $this->hasMany(Departament::class, 'departament_id');
     }

@@ -24,6 +24,8 @@ class User extends Authenticatable implements JWTSubject
         'password',
     ];
 
+    protected $guard = 'api_users';
+
     /**
      * The attributes that should be hidden for serialization.
      *

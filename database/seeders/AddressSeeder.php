@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Address;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Faker\Factory as Faker;
 
 class AddressSeeder extends Seeder
 {
@@ -16,21 +17,21 @@ class AddressSeeder extends Seeder
     public function run()
     {
 
+        $faker = Faker::create();
         $NUMBER_OF_RECORDS = 10;
 
         for ($i = 0; $i < $NUMBER_OF_RECORDS ; $i++){
 
-            Address::insert([
-                'cep'           => Str::random(8),
-                'logradouro'    => Str::random(16),
-                'bairro'        => Str::random(2),
-                'cidade'        => Str::random(4),
-                'uf'            => Str::random(2),
-                'complemento'   => Str::random(7),
-                'numero'        => Str::random(2),
-
-
+            Address::create([
+                'cep'           => $faker->unique()->postcode,
+                'logradouro'    => $faker->unique()->streetName,
+                'bairro'        => $faker->cityPrefix,
+                'cidade'        => $faker->city,
+                'uf'            => $faker->stateAbbr,
+                'complemento'   => $faker->secondaryAddress,
+                'numero'        => $faker->buildingNumber,
             ]);
+
         }
     }
 }

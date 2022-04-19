@@ -6,10 +6,12 @@ use App\Models\Operator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
 class OperatorController extends Controller
 {
+    use HasRoles;
     /**
      * Display a listing of the resource.
      *

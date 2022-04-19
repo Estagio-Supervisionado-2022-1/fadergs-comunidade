@@ -31,7 +31,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
         foreach ($permissions as $permission){
             Permission::create([
-                'name' => $permission,
+                'name'          => $permission,
+                'created_at'    => now(),
+                'updated_at'    => now()
             ]);
         }
 
