@@ -51,7 +51,11 @@ Para gerar key do laravel basta usar `make laravel-key` na pasta docker
 ```bash
 make laravel-key
 ```
-
+Executando migrações
+Executando todas as migrações pendentes do laravel `make laravel-run-all-migrations`
+```bash
+make laravel-run-all-migrations
+```
 ## Images pré configuradas
 
 - [Nginx](https://www.nginx.com/)
