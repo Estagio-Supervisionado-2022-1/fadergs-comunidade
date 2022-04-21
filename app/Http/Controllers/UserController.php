@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Crypt;
 
 class UserController extends Controller
 {
@@ -38,8 +39,7 @@ class UserController extends Controller
         $user = new User;
         $user->name = $request->name;
         $user->email = $request->email;
-        $user->password = $request->password;
-        
+        $user->password = Crypt::encrypt($request->password);
         $user->save();
 
         return $user;
@@ -76,7 +76,11 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $user->update($request->all());
+        $user->update([
+            "name" => $request->nome,
+            "email" => $request->email,
+            "password" => Crypt::encrypt($request->password)
+        ]);
 
         return $user;
     }
