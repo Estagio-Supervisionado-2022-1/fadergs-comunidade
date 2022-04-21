@@ -56,6 +56,15 @@ Executando todas as migrações pendentes do laravel `make laravel-run-all-migra
 ```bash
 make laravel-run-all-migrations
 ```
+Executando migrações
+Executando todas as migrações pendentes do laravel `make laravel-run-all-migrations`
+```bash
+make laravel-run-all-migrations
+```
+Usar o servidor de desenvolvimento embutido do PHP, você pode usar o comando artisan serve: `php artisan serve`
+```bash
+make laravel-artisan-serve
+```
 ## Images pré configuradas
 
 - [Nginx](https://www.nginx.com/)

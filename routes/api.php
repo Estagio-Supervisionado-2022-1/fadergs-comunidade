@@ -26,8 +26,13 @@ $api->version('v1', function ($api){
         return 'Hello Fadergs Comunidade';
     });
 
-    $api->post('/operators/signup', 'App\Http\Controllers\OperatorController@store');
-    $api->post('/operators/login', 'App\Http\Controllers\Auth\AuthController@login');
+    $api->group(['prefix' => 'operators'], function ($api){
+        $api->post('/signup', 'App\Http\Controllers\OperatorController@store');
+        $api->post('/login', 'App\Http\Controllers\Auth\AuthController@login');
+        
+        $api->post('password/email/recover/', 'App\Http\Controllers\OperatorController@sendEmailResetPassword');
+        $api->post('password/reset', 'App\Http\Controllers\OperatorController@resetPassword');
+    });
 
     $api->group(['middleware' => 'api', 'prefix' => 'auth'], function ($api){
         $api->post('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');

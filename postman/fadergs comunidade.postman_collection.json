@@ -11,9 +11,85 @@
 				{
 					"name": "login",
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
-						"url": null
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"fernando.effertz@example.net\",\n    \"password\": \"Brasil@10a\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API}}/operators/login",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"operators",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reset senha por token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"email@gmail.com\",\n    \"token\": \"a11af1062f7e5e05febf4cfa24077398b03941bfeac3e223af1ba997f3821eb4\",\n    \"password\": \"123@Edddddd\",\n    \"password_confirmation\": \"123@Edddddd\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API}}/operators/password/reset",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"operators",
+								"password",
+								"reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "enviar email recuperação de senha Copy",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"email@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{API}}/operators/password/email/recover/",
+							"host": [
+								"{{API}}"
+							],
+							"path": [
+								"operators",
+								"password",
+								"email",
+								"recover",
+								""
+							]
+						}
 					},
 					"response": []
 				}

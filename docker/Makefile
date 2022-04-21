@@ -12,5 +12,8 @@ laravel-key:
 laravel-run-all-migrations:
 	docker-compose exec -w $(MYPATH) php php artisan migrate
 
+laravel-run-seed:
+	docker-compose exec -w $(MYPATH) php php artisan db:seed
+
 laravel-artisan-serve:
 	docker-compose exec -w /var/www/app.dev/ php php artisan serve --host 0.0.0.0
