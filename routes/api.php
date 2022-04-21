@@ -39,6 +39,12 @@ $api->version('v1', function ($api){
             $api->get('/home', 'App\Http\Controllers\Admin\AdminOperatorController@index');
     });
 
-    
+    $api->group(['prefix' => 'departament'], function ($api) {
+        $api->post('', 'App\Http\Controllers\DepartamentController@create');
+        $api->put('{id}', 'App\Http\Controllers\DepartamentController@update')->where('id', '[0-9]+');
+        $api->get('{id}', 'App\Http\Controllers\DepartamentController@show')->where('id', '[0-9]+');
+        $api->get('', 'App\Http\Controllers\DepartamentController@index');
+        $api->delete('{id}', 'App\Http\Controllers\DepartamentController@destroy')->where('id', '[0-9]+');
+    });
 
 });
