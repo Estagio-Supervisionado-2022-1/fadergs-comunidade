@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +28,6 @@ $api->version('v1', function ($api){
     });
 
     $api->group(['prefix'=> 'auth'], function ($api){
-        $api->post('/operator/signup', 'App\Http\Controllers\OperatorController@store');
         $api->post('/operator/login', 'App\Http\Controllers\Auth\AuthController@login');
         
         $api->group(['middleware' => 'api.auth', 'prefix' => 'operator'], function ($api){
@@ -37,11 +37,15 @@ $api->version('v1', function ($api){
     });
     
 
-   
+   // CRIAR ROTA PARA EDITAR INFORMAÇÕES SEPARADAMENTE
 
     $api->group(['middleware' => ['role:admin'], 'prefix' => 'admin'], 
         function ($api){
             $api->get('/home', 'App\Http\Controllers\Admin\AdminOperatorController@index');
+            $api->group(['middleware' => ['role:admin'], 'prefix' => 'accounts'], 
+                function ($api){
+                    $api->resource('admin', AdminAccountController::class);
+            });
     });
 
     
