@@ -15,12 +15,16 @@ class DepartamentSeeder extends Seeder
      */
     public function run()
     {
-        $NUMBER_OF_RECORDS = 10;
 
-        for ($i = 0; $i < $NUMBER_OF_RECORDS ; $i++){
+        $departaments = ['NuPJur', 'NuPSau', 'NuPTecInfo', 'NuPCont'];
+
+        foreach ($departaments as $departament) {
             Departament::insert([
-                'name'      => Str::random(10),
+                'name'          => $departament,
+                'created_at'    => now(),
+                'updated_at'    => now(),
             ]);
         }
+
     }
 }
