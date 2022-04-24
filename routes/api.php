@@ -37,13 +37,13 @@ $api->version('v1', function ($api){
         });
     });
 
-    // Route::resource('users', UserController::class);
-    $api->group(['prefix' => 'api/user'], function ($api) {
-        $api->post('', 'App\Http\Controllers\UserController@create');
-        $api->put('{id}', 'App\Http\Controllers\UserController@update')->where('id', '[0-9]+');
-        $api->get('{id}', 'App\Http\Controllers\UserController@show')->where('id', '[0-9]+');
-        $api->get('', 'App\Http\Controllers\UserController@index');
-    });    
+    Route::resource('users', UserController::class);
+    // $api->group(['prefix' => 'api/user'], function ($api) {
+    //     $api->post('', 'App\Http\Controllers\UserController@create');
+    //     $api->put('{id}', 'App\Http\Controllers\UserController@update')->where('id', '[0-9]+');
+    //     $api->get('{id}', 'App\Http\Controllers\UserController@show')->where('id', '[0-9]+');
+    //     $api->get('', 'App\Http\Controllers\UserController@index');
+    // });    
 
     $api->group(['middleware' => ['role:admin'], 'prefix' => 'admin'], 
         function ($api){
