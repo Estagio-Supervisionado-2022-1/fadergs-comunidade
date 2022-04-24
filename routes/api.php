@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,15 +36,16 @@ $api->version('v1', function ($api){
             $api->post('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
         });
     });
-    
 
-   
+    $api->group(['prefix' => 'api/user'], function ($api) {
+        $api->post('', 'App\Http\Controllers\UserController@create');
+        $api->put('{id}', 'App\Http\Controllers\UserController@update')->where('id', '[0-9]+');
+        $api->get('{id}', 'App\Http\Controllers\UserController@show')->where('id', '[0-9]+');
+        $api->get('', 'App\Http\Controllers\UserController@index');
+    });  
 
     $api->group(['middleware' => ['role:admin'], 'prefix' => 'admin'], 
         function ($api){
             $api->get('/home', 'App\Http\Controllers\Admin\AdminOperatorController@index');
     });
-
-    
-
 });
