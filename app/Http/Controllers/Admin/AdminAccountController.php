@@ -87,7 +87,7 @@ class AdminAccountController extends Controller
 
         try {
             $faker = Faker::create();
-            $password = $faker->password;
+            $password = $faker->password(8,12);
 
             $administrator = Operator::firstOrCreate([
                 'name'              => $request->name,
@@ -137,7 +137,7 @@ class AdminAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
-        
+
         if (! $administrator = Operator::where('id', $id)->with('Departament')->first()) {
             throw new NotFoundHttpException('Usuário não encontrado com o id = ' . $id);
         }
@@ -217,7 +217,7 @@ class AdminAccountController extends Controller
             }
 
             $faker = Faker::create();
-            $password = $faker->password;
+            $password = $faker->password(8,12);
 
             $administrator->updateOrCreate(['id' => $administrator->id], [
                 'password' => $password,
