@@ -78,8 +78,18 @@ class AdminAccountController extends Controller
                 'integer'
             ]
         ];
+        $messagesToReturn = [
+            'required' => 'O campo é obrigatório',
+            'name.string' => 'O campo precisa ser uma string',
+            'min' => 'O campo precisa conter no mínimo 3 carateres',
+            'max' => 'O campo excedeu 50 caracteres',
+            'email' => 'O campo precisa ser um e-mail válido',
+            'email.max' => 'O campo excedeu 255 caracteres',
+            'email.unique' => 'O e-mail já está cadastrado, reset a senha ou reative o usuário',
+            'integer' => 'O campo precisa ser um número inteiro'
+        ];
 
-        $validatorReturn = Validator::make($request->all(), $rulesToValidate);
+        $validatorReturn = Validator::make($request->all(), $rulesToValidate, $messagesToReturn);
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
@@ -143,103 +153,107 @@ class AdminAccountController extends Controller
             throw new NotFoundHttpException('Administrador não encontrado com o id = ' . $id);
         }
 
-        if (!empty($request->name)){
-            $validatorReturn = Validator::make($request->all(), [
-                'name'          => [
-                    'required',
-                    'string',
-                    'min:3',
-                    'max:50'
-                ]
-            ]);
-        
+        if ($administrator->hasRole('admin')){
 
-            if ($validatorReturn->fails()){
-                return response()->json(['errors' => $validatorReturn->errors()]);
+            if (!empty($request->name)){
+                $validatorReturn = Validator::make($request->all(), [
+                    'name'          => [
+                        'required',
+                        'string',
+                        'min:3',
+                        'max:50'
+                    ]
+                ]);
+            
+
+                if ($validatorReturn->fails()){
+                    return response()->json(['errors' => $validatorReturn->errors()]);
+                }
+
+                $administrator->updateOrCreate(['id' => $administrator->id], [
+                    'name' => $request->name,
+                ]);
+
             }
 
-            $administrator->updateOrCreate(['id' => $administrator->id], [
-                'name' => $request->name,
-            ]);
+            if (!empty($request->email)){
+                $validatorReturn = Validator::make($request->all(), [
+                    'email'         => [
+                        'required',
+                        'email',
+                        'max:255',
+                        'unique:operators,email'
+                    ],
+                ]);
+            
 
-        }
+                if ($validatorReturn->fails()){
+                    return response()->json(['errors' => $validatorReturn->errors()]);
+                }
 
-        if (!empty($request->email)){
-            $validatorReturn = Validator::make($request->all(), [
-                'email'         => [
-                    'required',
-                    'email',
-                    'max:255',
-                    'unique:operators,email'
-                ],
-            ]);
-        
+                $administrator->updateOrCreate(['id' => $administrator->id], [
+                    'email' => $request->email,
+                ]);
 
-            if ($validatorReturn->fails()){
-                return response()->json(['errors' => $validatorReturn->errors()]);
             }
 
-            $administrator->updateOrCreate(['id' => $administrator->id], [
-                'email' => $request->email,
-            ]);
 
-        }
+            if (isset($request->departament_id)){
+                $validatorReturn = Validator::make($request->all(), [
+                    'departament_id' => [
+                        'required',
+                        'integer'
+                    ]
+                ]);
+            
 
+                if ($validatorReturn->fails()){
+                    return response()->json(['errors' => $validatorReturn->errors()]);
+                }
 
-        if (isset($request->departament_id)){
-            $validatorReturn = Validator::make($request->all(), [
-                'departament_id' => [
-                    'required',
-                    'integer'
-                ]
-            ]);
-        
-
-            if ($validatorReturn->fails()){
-                return response()->json(['errors' => $validatorReturn->errors()]);
+                $administrator->updateOrCreate(['id' => $administrator->id], [
+                    'departament_id' => $request->departament_id,
+                ]);
             }
 
-            $administrator->updateOrCreate(['id' => $administrator->id], [
-                'departament_id' => $request->departament_id,
-            ]);
-        }
+            if ($request->passwordReset){
+                $validatorReturn = Validator::make($request->all(), [
+                    'passwordReset'      => [
+                        'required',
+                        'accepted',
+                    ],
+                ]);
+            
 
-        if ($request->passwordReset){
-            $validatorReturn = Validator::make($request->all(), [
-                'passwordReset'      => [
-                    'required',
-                    'accepted',
-                ],
-            ]);
-        
+                if ($validatorReturn->fails()){
+                    return response()->json(['errors' => $validatorReturn->errors()]);
+                }
 
-            if ($validatorReturn->fails()){
-                return response()->json(['errors' => $validatorReturn->errors()]);
+                $faker = Faker::create();
+                $password = $faker->password(8,12);
+
+                $administrator->updateOrCreate(['id' => $administrator->id], [
+                    'password' => $password,
+                ]);
+
+                $loginData = [
+                    'admin_login' => $administrator->email,
+                    'admin_password' => $password
+                ];
+
+                Mail::to($administrator->email)
+                    ->send(new OperatorAccountResetPassword ($loginData));  
             }
-
-            $faker = Faker::create();
-            $password = $faker->password(8,12);
-
-            $administrator->updateOrCreate(['id' => $administrator->id], [
-                'password' => $password,
-            ]);
-
-            $loginData = [
-                'admin_login' => $administrator->email,
-                'admin_password' => $password
+            
+            $response = [
+                'message' => 'Administrador atualizado com sucesso',
+                'id' => $id
             ];
 
-            Mail::to($administrator->email)
-                ->send(new OperatorAccountResetPassword ($loginData));  
+            return response()->json($response)->setStatusCode(200);
         }
-        
-        $response = [
-            'message' => 'Administrador atualizado com sucesso',
-            'id' => $id
-        ];
 
-        return response()->json($response)->setStatusCode(200);
-
+        return response()->json(['errors' => 'Operador não é do tipo Administrador'])->setStatusCode(404);
 
     }
 

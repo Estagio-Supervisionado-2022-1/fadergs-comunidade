@@ -107,9 +107,9 @@ class AdminOperatorController extends Controller
         //
     }
 
-    public function restoreOperator ($email) {
-        if (! $operator = Operator::onlyTrashed()->where('email', $email)->with('roles', 'Departament', 'permissions')) {
-            throw new NotFoundHttpException('Operador não encontrado com o email = ' . $email);
+    public function restoreOperator (Request $request) {
+        if (! $operator = Operator::onlyTrashed()->where('email', $request->email)->with('roles', 'Departament', 'permissions')->get()) {
+            throw new NotFoundHttpException('Operador não encontrado com o email = ' . $request->email);
         }
 
         try {
