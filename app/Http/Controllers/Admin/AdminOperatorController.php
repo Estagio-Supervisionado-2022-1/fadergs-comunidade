@@ -15,6 +15,10 @@ use Dingo\Api\Exception\ValidationHttpException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Spatie\Permission\Traits\HasRoles;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Faker\Factory as Faker;
+use App\Mail\OperatorAccountResetPassword;
+use Illuminate\Support\Facades\Mail;
 
 class AdminOperatorController extends Controller
 {
@@ -103,5 +107,32 @@ class AdminOperatorController extends Controller
         //
     }
 
-    
+    public function restoreOperator ($email) {
+        if (! $operator = Operator::onlyTrashed()->where('email', $email)->with('roles', 'Departament', 'permissions')) {
+            throw new NotFoundHttpException('Operador não encontrado com o email = ' . $email);
+        }
+
+        try {
+            $operator->restore();
+
+            $faker = Faker::create();
+            $password = $faker->password(8,12);
+
+            $operator->updateOrCreate(['id' => $operator->id], [
+                'password' => $password,
+            ]);
+
+            $loginData = [
+                'admin_login' => $operator->email,
+                'admin_password' => $password
+            ];
+
+            Mail::to($operator->email)
+                ->send(new OperatorAccountResetPassword ($loginData));  
+        
+            return response()->json(['message_success' => 'Operador reativado com sucesso, uma nova senha foi enviada ao e-mail']);
+        } catch (HttpException $e) {
+            throw $e;
+        }
+    }
 }

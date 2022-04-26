@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAccountController;
+use App\Http\Controllers\Admin\ManagerAccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -50,6 +51,7 @@ $api->version('v1', function ($api){
             $api->group(['middleware' => ['role:admin'], 'prefix' => 'accounts'], 
                 function ($api){
                     $api->resource('admin', AdminAccountController::class);
+                    $api->resource('manager', ManagerAccountController::class);
             });
     });
 
