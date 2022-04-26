@@ -20,11 +20,11 @@ class Operator extends Authenticatable implements JWTSubject
     ];
 
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token', 'created_at', 'updated_at', 'deleted_at', 'email_verified_at'
     ];
 
     public function Departament () {
-        return $this->hasMany(Departament::class, 'departament_id');
+        return $this->hasMany(Departament::class, 'id');
     }
 
     public function setPasswordAttribute($password){
