@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\PasswordReset;
@@ -13,15 +14,17 @@ use Illuminate\Notifications\Notifiable;
 
 class Operator extends Authenticatable implements JWTSubject
 {
-    use HasRoles;
-    use Notifiable;
+    use HasRoles, SoftDeletes;
 
+    protected $softDelete = true;
+    
     protected $fillable = [
         'name',
         'email',
         'password',
         'departament_id',
     ];
+    
 
     protected $hidden = [
         'password', 'remember_token', 'created_at', 'updated_at', 'deleted_at', 'email_verified_at'

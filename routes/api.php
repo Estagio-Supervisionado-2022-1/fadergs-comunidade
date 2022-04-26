@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\DepartamentController;
+use App\Http\Controllers\Admin\ManagerAccountController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -64,6 +65,7 @@ $api->version('v1', function ($api){
                 function ($api){
                    $api->resource('departament', DepartamentController::class);
                     $api->resource('admin', AdminAccountController::class);
+                    $api->resource('manager', ManagerAccountController::class);
             });
     });
 

@@ -9,7 +9,6 @@ use App\Mail\OperatorAccountResetPassword;
 use App\Models\Operator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\Password;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -17,7 +16,8 @@ use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class AdminAccountController extends Controller
+
+class ManagerAccountController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -43,14 +43,16 @@ class AdminAccountController extends Controller
         $operatorData = new OperatorData();
 
         if ( $request->pagination) {
-            $administrators = $operatorData->getDataAdminOperator($request->pagination);
+            $managers = $operatorData->getDataManagerOperator($request->pagination);
         }
         else {
-            $administrators = $operatorData->getDataAdminOperator(10);
+            $managers = $operatorData->getDataManagerOperator(10);
         }
+        
+        
 
         return response()->json([
-            'administrators' => $administrators
+            'managers' => $managers
         ]);
     }
     /**
@@ -78,8 +80,18 @@ class AdminAccountController extends Controller
                 'integer'
             ]
         ];
+        $messagesToReturn = [
+                'required' => 'O campo é obrigatório',
+                'name.string' => 'O campo precisa ser uma string',
+                'min' => 'O campo precisa conter no mínimo 3 carateres',
+                'max' => 'O campo excedeu 50 caracteres',
+                'email' => 'O campo precisa ser um e-mail válido',
+                'email.max' => 'O campo excedeu 255 caracteres',
+                'email.unique' => 'O e-mail já está cadastrado, reset a senha ou reative o usuário',
+                'integer' => 'O campo precisa ser um número inteiro'
+            ];
 
-        $validatorReturn = Validator::make($request->all(), $rulesToValidate);
+        $validatorReturn = Validator::make($request->all(), $rulesToValidate, $messagesToReturn);
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
@@ -90,7 +102,7 @@ class AdminAccountController extends Controller
             $faker = Faker::create();
             $password = $faker->password(8,12);
 
-            $administrator = Operator::withTrashed()->firstOrCreate([
+            $manager = Operator::withTrashed()->firstOrCreate([
                 'name'              => $request->name,
                 'email'             => $request->email,
                 'password'          => $password,
@@ -105,13 +117,13 @@ class AdminAccountController extends Controller
             Mail::to($request->email)
                 ->send(new OperatorAccountCreation ($loginData));
     
-            $administrator->assignRole('admin');
+            $manager->assignRole('manager');
 
         } catch (JWTException $e) {
             throw $e;
         }
 
-        return response()->json(['user_success' => 'Administrador criado com sucesso!'])
+        return response()->json(['user_success' => 'Coordenador criado com sucesso!'])
                             ->setStatusCode(201);
 
     }
@@ -123,11 +135,11 @@ class AdminAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id){
-        if (! $administrator = Operator::where('id', $id)->with('Departament', 'roles', 'permissions')->first()) {
-            throw new NotFoundHttpException('Administrador não encontrado com o id = ' . $id);
+        if (! $manager = Operator::where('id', $id)->with('Departament', 'roles', 'permissions')->first()) {
+            throw new NotFoundHttpException('Coordenador não encontrado com o id = ' . $id);
         }
 
-        return response()->json($administrator)->setStatusCode(200);
+        return response()->json($manager)->setStatusCode(200);
     }
 
     /**
@@ -139,8 +151,8 @@ class AdminAccountController extends Controller
      */
     public function update(Request $request, $id) {
 
-        if (! $administrator = Operator::where('id', $id)->with('Departament')->first()) {
-            throw new NotFoundHttpException('Administrador não encontrado com o id = ' . $id);
+        if (! $manager = Operator::where('id', $id)->with('Departament')->first()) {
+            throw new NotFoundHttpException('Coordenador não encontrado com o id = ' . $id);
         }
 
         if (!empty($request->name)){
@@ -158,7 +170,7 @@ class AdminAccountController extends Controller
                 return response()->json(['errors' => $validatorReturn->errors()]);
             }
 
-            $administrator->updateOrCreate(['id' => $administrator->id], [
+            $manager->updateOrCreate(['id' => $manager->id], [
                 'name' => $request->name,
             ]);
 
@@ -179,7 +191,7 @@ class AdminAccountController extends Controller
                 return response()->json(['errors' => $validatorReturn->errors()]);
             }
 
-            $administrator->updateOrCreate(['id' => $administrator->id], [
+            $manager->updateOrCreate(['id' => $manager->id], [
                 'email' => $request->email,
             ]);
 
@@ -199,7 +211,7 @@ class AdminAccountController extends Controller
                 return response()->json(['errors' => $validatorReturn->errors()]);
             }
 
-            $administrator->updateOrCreate(['id' => $administrator->id], [
+            $manager->updateOrCreate(['id' => $manager->id], [
                 'departament_id' => $request->departament_id,
             ]);
         }
@@ -220,21 +232,21 @@ class AdminAccountController extends Controller
             $faker = Faker::create();
             $password = $faker->password(8,12);
 
-            $administrator->updateOrCreate(['id' => $administrator->id], [
+            $manager->updateOrCreate(['id' => $manager->id], [
                 'password' => $password,
             ]);
 
             $loginData = [
-                'admin_login' => $administrator->email,
+                'admin_login' => $manager->email,
                 'admin_password' => $password
             ];
 
-            Mail::to($administrator->email)
+            Mail::to($manager->email)
                 ->send(new OperatorAccountResetPassword ($loginData));  
         }
         
         $response = [
-            'message' => 'Administrador atualizado com sucesso',
+            'message' => 'Coordenador atualizado com sucesso',
             'id' => $id
         ];
 
@@ -251,23 +263,19 @@ class AdminAccountController extends Controller
      */
     public function destroy($id)
     {
-        if (! $administrator = Operator::find($id)) {
+        if (! $manager = Operator::find($id)) {
             throw new NotFoundHttpException('Operador não encontrado com o id = ' . $id);
         }
         try {
-            if ($administrator->hasRole('admin')){
-                $administrator->delete();
-                return response()->json(['message' => 'Administrador desativado com sucesso']);
+            if ($manager->hasRole('manager')){
+                $manager->delete();
+                return response()->json(['message' => 'Coordenador desativado com sucesso']);
             }
-
-            return response()->json(['message' => 'Administrador não encontrado com o id = ' . $id]);
+            return response()->json(['message' => 'Coordenador não encontrado com o id = ' . $id]);
+            
             
         } catch (HttpException $e) {
             throw $e;
         }
-
-        
-
-        
     }
 }
