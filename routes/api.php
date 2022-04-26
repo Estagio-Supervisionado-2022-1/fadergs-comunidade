@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\DepartamentController;
 use App\Http\Controllers\Admin\ManagerAccountController;
+use App\Http\Controllers\Admin\StudentAccountController;
+use App\Http\Controllers\Admin\ServiceManagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -61,11 +63,15 @@ $api->version('v1', function ($api){
     $api->group(['middleware' => ['role:admin'], 'prefix' => 'admin'], 
         function ($api){
             $api->get('/home', 'App\Http\Controllers\Admin\AdminOperatorController@index');
-            $api->group(['middleware' => ['role:admin'], 'prefix' => 'accounts'], 
+            $api->post('restore/operator', 'App\Http\Controllers\Admin\AdminOperatorController@restoreOperator');
+            $api->resource('service', ServiceManagementController::class);
+
+            $api->group(['prefix' => 'accounts'], 
                 function ($api){
                    $api->resource('departament', DepartamentController::class);
                     $api->resource('admin', AdminAccountController::class);
                     $api->resource('manager', ManagerAccountController::class);
+                    $api->resource('student', StudentAccountController::class);
             });
     });
 

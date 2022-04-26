@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Classes\OperatorData;
 use App\Http\Controllers\Controller;
-use App\Mail\OperatorAccountCreation;
-use App\Mail\OperatorAccountResetPassword;
-use App\Models\Operator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Mail\OperatorAccountCreation;
+use App\Mail\OperatorAccountResetPassword;
+use App\Models\Operator;
+use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Classes\OperatorData;
 
 
-class ManagerAccountController extends Controller
+class StudentAccountController extends Controller
 {
-    /**
+   /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -43,16 +43,14 @@ class ManagerAccountController extends Controller
         $operatorData = new OperatorData();
 
         if ( $request->pagination) {
-            $managers = $operatorData->getDataManagerOperator($request->pagination);
+            $students = $operatorData->getDataStudentOperator($request->pagination);
         }
         else {
-            $managers = $operatorData->getDataManagerOperator(10);
+            $students = $operatorData->getDataStudentOperator(10);
         }
-        
-        
 
         return response()->json([
-            'managers' => $managers
+            'students' => $students
         ]);
     }
     /**
@@ -102,7 +100,7 @@ class ManagerAccountController extends Controller
             $faker = Faker::create();
             $password = $faker->password(8,12);
 
-            $manager = Operator::withTrashed()->firstOrCreate([
+            $student = Operator::withTrashed()->firstOrCreate([
                 'name'              => $request->name,
                 'email'             => $request->email,
                 'password'          => $password,
@@ -117,13 +115,13 @@ class ManagerAccountController extends Controller
             Mail::to($request->email)
                 ->send(new OperatorAccountCreation ($loginData));
     
-            $manager->assignRole('manager');
+            $student->assignRole('student');
 
         } catch (JWTException $e) {
             throw $e;
         }
 
-        return response()->json(['user_success' => 'Coordenador criado com sucesso!'])
+        return response()->json(['user_success' => 'Aluno criado com sucesso!'])
                             ->setStatusCode(201);
 
     }
@@ -135,11 +133,11 @@ class ManagerAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id){
-        if (! $manager = Operator::where('id', $id)->with('Departament', 'roles', 'permissions')->first()) {
-            throw new NotFoundHttpException('Coordenador não encontrado com o id = ' . $id);
+        if (! $student = Operator::where('id', $id)->with('Departament', 'roles', 'permissions')->first()) {
+            throw new NotFoundHttpException('Aluno não encontrado com o id = ' . $id);
         }
 
-        return response()->json($manager)->setStatusCode(200);
+        return response()->json($student)->setStatusCode(200);
     }
 
     /**
@@ -151,12 +149,10 @@ class ManagerAccountController extends Controller
      */
     public function update(Request $request, $id) {
 
-        if (! $manager = Operator::where('id', $id)->with('Departament')->first()) {
-            throw new NotFoundHttpException('Coordenador não encontrado com o id = ' . $id);
+        if (! $student = Operator::where('id', $id)->with('Departament')->first()) {
+            throw new NotFoundHttpException('Aluno não encontrado com o id = ' . $id);
         }
-
-        if ( $manager->hasRole('manager')){
-
+        if ($student->hasRole('student')){
             if (!empty($request->name)){
                 $validatorReturn = Validator::make($request->all(), [
                     'name'          => [
@@ -172,7 +168,7 @@ class ManagerAccountController extends Controller
                     return response()->json(['errors' => $validatorReturn->errors()]);
                 }
 
-                $manager->updateOrCreate(['id' => $manager->id], [
+                $student->updateOrCreate(['id' => $student->id], [
                     'name' => $request->name,
                 ]);
 
@@ -193,7 +189,7 @@ class ManagerAccountController extends Controller
                     return response()->json(['errors' => $validatorReturn->errors()]);
                 }
 
-                $manager->updateOrCreate(['id' => $manager->id], [
+                $student->updateOrCreate(['id' => $student->id], [
                     'email' => $request->email,
                 ]);
 
@@ -213,7 +209,7 @@ class ManagerAccountController extends Controller
                     return response()->json(['errors' => $validatorReturn->errors()]);
                 }
 
-                $manager->updateOrCreate(['id' => $manager->id], [
+                $student->updateOrCreate(['id' => $student->id], [
                     'departament_id' => $request->departament_id,
                 ]);
             }
@@ -234,28 +230,28 @@ class ManagerAccountController extends Controller
                 $faker = Faker::create();
                 $password = $faker->password(8,12);
 
-                $manager->updateOrCreate(['id' => $manager->id], [
+                $student->updateOrCreate(['id' => $student->id], [
                     'password' => $password,
                 ]);
 
                 $loginData = [
-                    'admin_login' => $manager->email,
+                    'admin_login' => $student->email,
                     'admin_password' => $password
                 ];
 
-                Mail::to($manager->email)
+                Mail::to($student->email)
                     ->send(new OperatorAccountResetPassword ($loginData));  
             }
             
             $response = [
-                'message' => 'Coordenador atualizado com sucesso',
+                'message' => 'Aluno atualizado com sucesso',
                 'id' => $id
             ];
 
             return response()->json($response)->setStatusCode(200);
         }
 
-        return response()->json(['errors' => 'Operador não é do tipo Coordenador'])->setStatusCode(404);
+        return response()->json(['errors' => 'Operador não é do tipo Aluno'])->setStatusCode(404);
 
     }
 
@@ -267,15 +263,15 @@ class ManagerAccountController extends Controller
      */
     public function destroy($id)
     {
-        if (! $manager = Operator::find($id)) {
+        if (! $student = Operator::find($id)) {
             throw new NotFoundHttpException('Operador não encontrado com o id = ' . $id);
         }
         try {
-            if ($manager->hasRole('manager')){
-                $manager->delete();
-                return response()->json(['message' => 'Coordenador desativado com sucesso']);
+            if ($student->hasRole('student')){
+                $student->delete();
+                return response()->json(['message' => 'Aluno desativado com sucesso']);
             }
-            return response()->json(['message' => 'Coordenador não encontrado com o id = ' . $id]);
+            return response()->json(['message' => 'Aluno não encontrado com o id = ' . $id]);
             
             
         } catch (HttpException $e) {
