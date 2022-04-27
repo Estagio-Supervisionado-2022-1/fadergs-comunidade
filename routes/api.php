@@ -33,6 +33,7 @@ $api->version('v1', function ($api){
         $api->group(['middleware' => 'api.auth', 'prefix' => 'operator'], function ($api){
             $api->post('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
             $api->post('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
+            $api->post('/showForgetPasswordForm','App\Http\Controllers\Auth\ForgotPasswordController@showForgetPasswordForm');
         });
     });
     
@@ -44,6 +45,6 @@ $api->version('v1', function ($api){
             $api->get('/home', 'App\Http\Controllers\Admin\AdminOperatorController@index');
     });
 
-    
+        
 
 });
