@@ -51,6 +51,10 @@ class Departament extends Model
            ]);
         });
     }
+    public function Services () {
+        return $this->hasMany(Services::class, 'id');
+    }
+
     
     public function Operator (){
         return $this->belongsTo(Operator::class, 'departament_id');

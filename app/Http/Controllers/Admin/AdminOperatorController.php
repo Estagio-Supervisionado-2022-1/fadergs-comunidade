@@ -104,7 +104,7 @@ class AdminOperatorController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // 
     }
 
     public function restoreOperator (Request $request) {

@@ -121,7 +121,7 @@ class StudentAccountController extends Controller
             throw $e;
         }
 
-        return response()->json(['user_success' => 'Aluno criado com sucesso!'])
+        return response()->json(['message_success' => 'Aluno criado com sucesso!'])
                             ->setStatusCode(201);
 
     }
@@ -133,9 +133,10 @@ class StudentAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id){
-        if (! $student = Operator::where('id', $id)->with('Departament', 'roles', 'permissions')->first()) {
-            throw new NotFoundHttpException('Aluno não encontrado com o id = ' . $id);
-        }
+
+        $operatorData = new OperatorData();
+
+        $student = $operatorData->getDataStudentById($id);
 
         return response()->json($student)->setStatusCode(200);
     }
@@ -149,10 +150,10 @@ class StudentAccountController extends Controller
      */
     public function update(Request $request, $id) {
 
-        if (! $student = Operator::where('id', $id)->with('Departament')->first()) {
-            throw new NotFoundHttpException('Aluno não encontrado com o id = ' . $id);
-        }
-        if ($student->hasRole('student')){
+        $operatorData = new OperatorData();
+
+        $student = $operatorData->getDataStudentById($id);
+
             if (!empty($request->name)){
                 $validatorReturn = Validator::make($request->all(), [
                     'name'          => [
@@ -249,10 +250,7 @@ class StudentAccountController extends Controller
             ];
 
             return response()->json($response)->setStatusCode(200);
-        }
-
-        return response()->json(['errors' => 'Operador não é do tipo Aluno'])->setStatusCode(404);
-
+      
     }
 
     /**

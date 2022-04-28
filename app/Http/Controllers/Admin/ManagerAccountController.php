@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 
+
 class ManagerAccountController extends Controller
 {
     /**
@@ -123,7 +124,7 @@ class ManagerAccountController extends Controller
             throw $e;
         }
 
-        return response()->json(['user_success' => 'Coordenador criado com sucesso!'])
+        return response()->json(['message_success' => 'Coordenador criado com sucesso!'])
                             ->setStatusCode(201);
 
     }
@@ -135,10 +136,11 @@ class ManagerAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id){
-        if (! $manager = Operator::where('id', $id)->with('Departament', 'roles', 'permissions')->first()) {
-            throw new NotFoundHttpException('Coordenador não encontrado com o id = ' . $id);
-        }
 
+        $operatorData = new OperatorData();
+
+        $manager = $operatorData->getDataManagerById($id);
+            
         return response()->json($manager)->setStatusCode(200);
     }
 
@@ -151,11 +153,9 @@ class ManagerAccountController extends Controller
      */
     public function update(Request $request, $id) {
 
-        if (! $manager = Operator::where('id', $id)->with('Departament')->first()) {
-            throw new NotFoundHttpException('Coordenador não encontrado com o id = ' . $id);
-        }
+        $operatorData = new OperatorData();
 
-        if ( $manager->hasRole('manager')){
+        $manager = $operatorData->getDataManagerById($id);
 
             if (!empty($request->name)){
                 $validatorReturn = Validator::make($request->all(), [
@@ -253,9 +253,7 @@ class ManagerAccountController extends Controller
             ];
 
             return response()->json($response)->setStatusCode(200);
-        }
 
-        return response()->json(['errors' => 'Operador não é do tipo Coordenador'])->setStatusCode(404);
 
     }
 
