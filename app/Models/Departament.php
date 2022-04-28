@@ -17,5 +17,9 @@ class Departament extends Model
         return $this->belongsTo(Operator::class, 'departament_id');
     }
 
+    public function Services () {
+        return $this->hasMany(Services::class, 'id');
+    }
+
     
 }

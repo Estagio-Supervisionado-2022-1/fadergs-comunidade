@@ -121,7 +121,7 @@ class AdminAccountController extends Controller
             throw $e;
         }
 
-        return response()->json(['user_success' => 'Administrador criado com sucesso!'])
+        return response()->json(['message_success' => 'Administrador criado com sucesso!'])
                             ->setStatusCode(201);
 
     }
@@ -133,9 +133,10 @@ class AdminAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id){
-        if (! $administrator = Operator::where('id', $id)->with('Departament', 'roles', 'permissions')->first()) {
-            throw new NotFoundHttpException('Administrador não encontrado com o id = ' . $id);
-        }
+
+        $operatorData = new OperatorData();
+
+        $administrator = $operatorData->getDataAdminById($id);
 
         return response()->json($administrator)->setStatusCode(200);
     }
@@ -149,11 +150,9 @@ class AdminAccountController extends Controller
      */
     public function update(Request $request, $id) {
 
-        if (! $administrator = Operator::where('id', $id)->with('Departament')->first()) {
-            throw new NotFoundHttpException('Administrador não encontrado com o id = ' . $id);
-        }
+        $operatorData = new OperatorData();
 
-        if ($administrator->hasRole('admin')){
+        $administrator = $operatorData->getDataAdminById($id);        
 
             if (!empty($request->name)){
                 $validatorReturn = Validator::make($request->all(), [
@@ -251,10 +250,7 @@ class AdminAccountController extends Controller
             ];
 
             return response()->json($response)->setStatusCode(200);
-        }
-
-        return response()->json(['errors' => 'Operador não é do tipo Administrador'])->setStatusCode(404);
-
+        
     }
 
     /**

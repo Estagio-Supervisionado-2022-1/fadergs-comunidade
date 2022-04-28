@@ -7,9 +7,9 @@ use App\Models\Service;
 class ServiceData {
 
     public function getServiceData ($pagination){
-        $services = Service::all() == null ?
+        $services = Service::all()->isEmpty() ?
                             ['service_error' => 'Não existem serviços cadastrados'] :
-                            Service::all()->paginate($pagination);
+                            Service::with('departaments')->paginate($pagination);
 
         return $services;  
     }
