@@ -21,22 +21,20 @@ class ServiceManagementController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request){
-        $rulesToValidate = [
-            'pagination' => [
-                'integer',
-                Rule::in([10, 25, 50, 100])
-            ]
-        ];
+        
+        $serviceData = new ServiceData();
 
-        $validatorReturn = Validator::make($request->all(), $rulesToValidate);
+        $validatorReturn = Validator::make(
+            $request->all(), 
+            $serviceData->getIndexRulesToValidate(), 
+            $serviceData->getErrorMessagesToValidate()
+        );
 
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
             ]);
         }
-
-        $serviceData = new ServiceData();
 
         if ( $request->pagination) {
             $services = $serviceData->getServiceData ($request->pagination);
@@ -56,27 +54,15 @@ class ServiceManagementController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request){
-        $rulesToValidate= [
-            'name'          => [
-                'required',
-                'string',
-                'min:3',
-                'max:50'
-            ],
-            'departament_id' => [
-                'required',
-                'integer'
-            ]
-        ];
-        $messagesToReturn = [
-                'required' => 'O campo é obrigatório',
-                'name.string' => 'O campo precisa ser uma string',
-                'min' => 'O campo precisa conter no mínimo 3 carateres',
-                'max' => 'O campo excedeu 50 caracteres',
-                'integer' => 'O campo precisa ser um número inteiro'
-            ];
+        $serviceData = new ServiceData();
 
-        $validatorReturn = Validator::make($request->all(), $rulesToValidate, $messagesToReturn);
+        $validatorReturn = Validator::make(
+            $request->all(), 
+            $serviceData->getStoreRulesToValidate(), 
+            $serviceData->getErrorMessagesToValidate()
+        );
+
+
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
@@ -128,6 +114,8 @@ class ServiceManagementController extends Controller
      */
     public function update(Request $request, $id) {
 
+        $serviceData = new ServiceData();
+
         if (! $service = Service::where('id', $id)->with('departaments')->first()) {
             throw new NotFoundHttpException('Serviço não encontrado com o id = ' . $id);
         }
@@ -139,7 +127,7 @@ class ServiceManagementController extends Controller
                         'min:3',
                         'max:50'
                     ]
-                ]);
+                ], $serviceData->getErrorMessagesToValidate());
             
 
                 if ($validatorReturn->fails()){
@@ -158,7 +146,7 @@ class ServiceManagementController extends Controller
                         'required',
                         'integer'
                     ]
-                ]);
+                ], $serviceData->getErrorMessagesToValidate());
             
 
                 if ($validatorReturn->fails()){
@@ -167,10 +155,9 @@ class ServiceManagementController extends Controller
 
                 
 
-                if (! $departament = Departament::find($request->departament_id)->first()){
+                if (! $departament = Departament::find($request->departament_id)){
                     throw new NotFoundHttpException('Departamento não encontrado com o id = ' . $request->departament_id);
                 }
-    
                 
                 $service->updateOrCreate(['id' => $id], [
                     'departament_id' => $departament->id,
