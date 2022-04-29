@@ -10,7 +10,6 @@ use App\Models\Operator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use Illuminate\Validation\Rule;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Mail;
@@ -26,14 +25,14 @@ class ManagerAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request){
-        $rulesToValidate = [
-            'pagination' => [
-                'integer',
-                Rule::in([10, 25, 50, 100])
-            ]
-        ];
 
-        $validatorReturn = Validator::make($request->all(), $rulesToValidate);
+        $operatorData = new OperatorData();
+
+        $validatorReturn = Validator::make(
+            $request->all(), 
+            $operatorData->getIndexRulesToValidate(), 
+            $operatorData->getErrorMessagesToValidate()
+        );
 
         if ($validatorReturn->fails()){
             return response()->json([
@@ -41,16 +40,12 @@ class ManagerAccountController extends Controller
             ]);
         }
 
-        $operatorData = new OperatorData();
-
         if ( $request->pagination) {
             $managers = $operatorData->getDataManagerOperator($request->pagination);
         }
         else {
             $managers = $operatorData->getDataManagerOperator(10);
         }
-        
-        
 
         return response()->json([
             'managers' => $managers
@@ -63,36 +58,15 @@ class ManagerAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request){
-        $rulesToValidate= [
-            'name'          => [
-                'required',
-                'string',
-                'min:3',
-                'max:50'
-            ],
-            'email'         => [
-                'required',
-                'email',
-                'max:255',
-                'unique:operators,email'
-            ],
-            'departament_id' => [
-                'required',
-                'integer'
-            ]
-        ];
-        $messagesToReturn = [
-                'required' => 'O campo é obrigatório',
-                'name.string' => 'O campo precisa ser uma string',
-                'min' => 'O campo precisa conter no mínimo 3 carateres',
-                'max' => 'O campo excedeu 50 caracteres',
-                'email' => 'O campo precisa ser um e-mail válido',
-                'email.max' => 'O campo excedeu 255 caracteres',
-                'email.unique' => 'O e-mail já está cadastrado, reset a senha ou reative o usuário',
-                'integer' => 'O campo precisa ser um número inteiro'
-            ];
 
-        $validatorReturn = Validator::make($request->all(), $rulesToValidate, $messagesToReturn);
+        $operatorData = new operatorData();
+
+        $validatorReturn = Validator::make(
+            $request->all(), 
+            $operatorData->getStoreRulesToValidate(), 
+            $operatorData->getErrorMessagesToValidate()
+        );
+        
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
@@ -165,7 +139,7 @@ class ManagerAccountController extends Controller
                         'min:3',
                         'max:50'
                     ]
-                ]);
+                ], $operatorData->getErrorMessagesToValidate());
             
 
                 if ($validatorReturn->fails()){
@@ -186,7 +160,7 @@ class ManagerAccountController extends Controller
                         'max:255',
                         'unique:operators,email'
                     ],
-                ]);
+                ], $operatorData->getErrorMessagesToValidate());
             
 
                 if ($validatorReturn->fails()){
@@ -206,7 +180,7 @@ class ManagerAccountController extends Controller
                         'required',
                         'integer'
                     ]
-                ]);
+                ], $operatorData->getErrorMessagesToValidate());
             
 
                 if ($validatorReturn->fails()){
@@ -219,12 +193,7 @@ class ManagerAccountController extends Controller
             }
 
             if ($request->passwordReset){
-                $validatorReturn = Validator::make($request->all(), [
-                    'passwordReset'      => [
-                        'required',
-                        'accepted',
-                    ],
-                ]);
+                $validatorReturn = Validator::make($request->all(), $operatorData->getPasswordResetRulesToValidade(), $operatorData->getErrorMessagesToValidate());
             
 
                 if ($validatorReturn->fails()){
@@ -280,4 +249,5 @@ class ManagerAccountController extends Controller
             throw $e;
         }
     }
+
 }

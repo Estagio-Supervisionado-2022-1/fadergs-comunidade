@@ -4,6 +4,7 @@ namespace App\Classes;
 
 use App\Models\Operator;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class OperatorData {
@@ -100,6 +101,51 @@ class OperatorData {
        throw new NotFoundHttpException('Aluno não encontrado com o id = ' . $id);
        
     }
-        
 
+    public function getIndexRulesToValidate (){
+        return [
+            'pagination' => [
+                'integer',
+                Rule::in([10, 25, 50, 100])
+            ],
+        ];
+    }
+
+    public function getStoreRulesToValidate () {
+        return [
+            'name'          => [
+                'required',
+                'string',
+                'min:3',
+                'max:50'
+            ],
+            'email'         => [
+                'required',
+                'email',
+                'max:255',
+                'unique:operators,email'
+            ],
+            'departament_id' => [
+                'required',
+                'integer'
+            ]
+        ];
+    }
+
+
+    public function getErrorMessagesToValidate(){
+        return [
+            'required' => 'O campo é obrigatório',
+            'name.string' => 'O campo precisa ser uma string',
+            'min' => 'O campo precisa conter no mínimo 3 carateres',
+            'max' => 'O campo excedeu 50 caracteres',
+            'email' => 'O campo precisa ser um e-mail válido',
+            'email.max' => 'O campo excedeu 255 caracteres',
+            'email.unique' => 'O e-mail já está cadastrado, reset a senha ou reative o usuário',
+            'integer' => 'O campo precisa ser um número inteiro',
+            'passwordReset.accepted' => 'Os parâmetros fornecidos não estão corretos'
+        ];
+    }
+
+    
 }
