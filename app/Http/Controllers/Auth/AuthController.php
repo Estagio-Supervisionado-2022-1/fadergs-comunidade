@@ -13,7 +13,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 class AuthController extends Controller
 {
     public function login(Request $request){
-        $rulesToValidate= [
+        $rulesToValidate = [
             'email'         => [
                 'required',
                 'email',
@@ -82,4 +82,6 @@ class AuthController extends Controller
             'expires_in'        => auth()->factory()->getTTL() * 60,
         ]);
     }
+
+    
 }
