@@ -33,13 +33,7 @@ class DepartamentController extends Controller
      */
     public function create(Request $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|min:3|max:255',
-        ]);
-
-        $departament = $this->modelDepartament->create($data);
-
-        return response()->json($departament, 201);
+        //
     }
 
     /**
@@ -50,7 +44,13 @@ class DepartamentController extends Controller
      */
     public function store(Request $request)
     {
-       //
+        $data = $request->validate([
+            'name' => 'required|string|min:3|max:255',
+        ]);
+
+        $departament = $this->modelDepartament->create($data);
+        
+        return response()->json($departament, 201);
     }
 
     /**
@@ -67,7 +67,7 @@ class DepartamentController extends Controller
             return abort(404);
         }
 
-        $departament->history;
+        $departament->load('history');
         
         return response()->json($departament, 200);
     }

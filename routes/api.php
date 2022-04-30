@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAccountController;
+use App\Http\Controllers\DepartamentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -49,16 +50,9 @@ $api->version('v1', function ($api){
             $api->get('/home', 'App\Http\Controllers\Admin\AdminOperatorController@index');
             $api->group(['middleware' => ['role:admin'], 'prefix' => 'accounts'], 
                 function ($api){
+                    $api->resource('departament', AdminAccountController::class);
                     $api->resource('admin', AdminAccountController::class);
             });
-    });
-
-    $api->group(['prefix' => 'departament'], function ($api) {
-        $api->post('', 'App\Http\Controllers\DepartamentController@create');
-        $api->put('{id}', 'App\Http\Controllers\DepartamentController@update')->where('id', '[0-9]+');
-        $api->get('{id}', 'App\Http\Controllers\DepartamentController@show')->where('id', '[0-9]+');
-        $api->get('', 'App\Http\Controllers\DepartamentController@index');
-        $api->delete('{id}', 'App\Http\Controllers\DepartamentController@destroy')->where('id', '[0-9]+');
     });
 
 });

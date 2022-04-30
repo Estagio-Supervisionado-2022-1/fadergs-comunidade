@@ -12,6 +12,8 @@ class Departament extends Model
 
     protected $fillable = ['name'];
 
+    public static $attrMakeHidden = ['id', 'updated_at', 'created_at', 'deleted_at'];
+
     public function history() {
         return $this->hasMany(HistoryActionDepartament::class, 'departament_id');
     }
@@ -25,8 +27,9 @@ class Departament extends Model
                 'departament_id' => $model->id,
                 'user_id' => 0,
                 'action' => HistoryActionDepartament::ACTION_INSETED,
-                'data' => $model->makeHidden(['id', 'updated_at', 'created_at', 'deleted_at'])->toJson()
+                'data' => $model->makeHidden(Departament::$attrMakeHidden)->toJson()
            ]);
+           $model->makeVisible(Departament::$attrMakeHidden);
         });
 
         self::updated(function ($model) {
@@ -34,8 +37,9 @@ class Departament extends Model
                 'departament_id' => $model->id,
                 'user_id' => 0,
                 'action' => HistoryActionDepartament::ACTION_UPDATED,
-                'data' => $model->makeHidden(['id', 'updated_at', 'created_at', 'deleted_at'])->toJson()
+                'data' => $model->makeHidden(Departament::$attrMakeHidden)->toJson()
            ]);
+           $model->makeVisible(Departament::$attrMakeHidden);
         });
 
         self::deleted(function ($model) {
@@ -43,7 +47,7 @@ class Departament extends Model
                 'departament_id' => $model->id,
                 'user_id' => 0,
                 'action' => HistoryActionDepartament::ACTION_DELETED,
-                'data' => $model->makeHidden(['id', 'updated_at', 'created_at', 'deleted_at'])->toJson()
+                'data' => $model->makeHidden(Departament::$attrMakeHidden)->toJson()
            ]);
         });
     }
