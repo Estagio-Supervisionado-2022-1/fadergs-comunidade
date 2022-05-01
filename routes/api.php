@@ -50,7 +50,7 @@ $api->version('v1', function ($api){
             $api->get('/home', 'App\Http\Controllers\Admin\AdminOperatorController@index');
             $api->group(['middleware' => ['role:admin'], 'prefix' => 'accounts'], 
                 function ($api){
-                    $api->resource('departament', AdminAccountController::class);
+                   $api->resource('departament', DepartamentController::class);
                     $api->resource('admin', AdminAccountController::class);
             });
     });

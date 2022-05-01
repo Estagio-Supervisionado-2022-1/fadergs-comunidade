@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Departament;
+use Symfony\Component\HttpFoundation\Response;
 
 class DepartamentController extends Controller
 {
@@ -22,7 +23,10 @@ class DepartamentController extends Controller
     public function index()
     {
         $departaments = $this->modelDepartament->get();
-        return response()->json($departaments, $departaments->count() ? 200 : 204);
+        return response()->json(
+            $departaments, 
+            $departaments->count() ? Response::HTTP_OK : Response::HTTP_NO_CONTENT
+        );
     }
 
     /**
@@ -50,7 +54,7 @@ class DepartamentController extends Controller
 
         $departament = $this->modelDepartament->create($data);
         
-        return response()->json($departament, 201);
+        return response()->json($departament, Response::HTTP_CREATED);
     }
 
     /**
@@ -64,12 +68,12 @@ class DepartamentController extends Controller
         $departament = $this->modelDepartament->find($id);
         
         if (empty($departament)) {
-            return abort(404);
+            return response(null, Response::HTTP_NOT_FOUND);
         }
 
         $departament->load('history');
         
-        return response()->json($departament, 200);
+        return response()->json($departament, Response::HTTP_OK);
     }
 
     /**
@@ -99,12 +103,12 @@ class DepartamentController extends Controller
         $departament = $this->modelDepartament->find($id);
         
         if (empty($departament)) {
-            return abort(404);
+            return response(null, Response::HTTP_NOT_FOUND);
         }
 
         $departament->update($data);
         
-        return response()->json($departament, 200);
+        return response()->json($departament, Response::HTTP_OK);
     }
 
     /**
@@ -118,11 +122,11 @@ class DepartamentController extends Controller
         $departament = $this->modelDepartament->find($id);
         
         if (empty($departament)) {
-            return abort(404);
+            return response(null, Response::HTTP_NOT_FOUND);
         }
 
         $departament->delete();
         
-        return abort(204);
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }
