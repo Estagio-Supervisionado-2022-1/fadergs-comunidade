@@ -48,12 +48,14 @@ $api->version('v1', function ($api){
         $api->post('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
     });
 
-    $api->group(['prefix' => 'api/user'], function ($api) {
-        $api->post('', 'App\Http\Controllers\UserController@create');
-        $api->put('{id}', 'App\Http\Controllers\UserController@update')->where('id', '[0-9]+');
-        $api->get('{id}', 'App\Http\Controllers\UserController@show')->where('id', '[0-9]+');
-        $api->get('', 'App\Http\Controllers\UserController@index');
-    });  
+    $api->group(['prefix' => ''], function ($api) {
+        $api->post('/users', 'App\Http\Controllers\UserController@store');
+        $api->group(['middleware' => 'api.auth', 'prefix' => ''], function ($api){
+            $api->put('/users/{id}', 'App\Http\Controllers\UserController@update')->where('id', '[0-9]+');
+            $api->get('/users/{id}', 'App\Http\Controllers\UserController@show')->where('id', '[0-9]+');
+            $api->get('/users', 'App\Http\Controllers\UserController@index');
+        });
+    }); 
 
     $api->group(['middleware' => ['role:admin'], 'prefix' => 'admin'], 
         function ($api){
