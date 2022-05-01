@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Operator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rules\Password as PasswordRules;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Exceptions\JWTException;
 
@@ -46,7 +47,7 @@ class OperatorController extends Controller
             'password'      => [
                 'required',
                 'string',
-                Password::min(8)
+                PasswordRules::min(8)
                             ->mixedCase()
                             ->numbers()
                             ->symbols()
@@ -123,5 +124,44 @@ class OperatorController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function sendEmailResetPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        
+        $status = Password::broker('operators')->sendResetLink(
+            $request->only('email')
+        );
+    
+        return response()->json(['status' => $status], ($status == Password::RESET_LINK_SENT ? 200 : 400));
+    }
+
+    public function resetPassword(Request $request) {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'token' => 'required|string',
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                PasswordRules::min(8)
+                            ->mixedCase()
+                            ->numbers()
+                            ->symbols()
+                            ->uncompromised()
+            ]
+        ]);
+
+        $resetPasswordStatus = Password::broker('operators')->reset($credentials, function ($user, $password) {
+            $user->password = $password;
+            $user->save();
+        });
+
+        if ($resetPasswordStatus == Password::INVALID_TOKEN) {
+            return response()->json(["msg" => "Invalid token provided"], 400);
+        }
+
+        return response()->json(["msg" => "Password has been successfully changed"]);
     }
 }
