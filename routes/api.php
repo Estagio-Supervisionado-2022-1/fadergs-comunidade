@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAccountController;
+use App\Http\Controllers\DepartamentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,10 +29,16 @@ $api->version('v1', function ($api){
         return 'Hello Fadergs Comunidade';
     });
 
-    $api->group(['prefix' => 'operators'], function ($api){
-        $api->post('/signup', 'App\Http\Controllers\OperatorController@store');
-        $api->post('/login', 'App\Http\Controllers\Auth\AuthController@login');
+    $api->group(['prefix'=> 'auth'], function ($api){
+        $api->post('/operator/login', 'App\Http\Controllers\Auth\AuthController@login');
         
+        $api->group(['middleware' => 'api.auth', 'prefix' => 'operator'], function ($api){
+            $api->post('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
+            $api->post('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
+        });
+    });
+        
+    $api->group(['prefix' => 'operators'], function ($api){
         $api->post('password/email/recover/', 'App\Http\Controllers\OperatorController@sendEmailResetPassword');
         $api->post('password/reset', 'App\Http\Controllers\OperatorController@resetPassword');
     });
@@ -39,11 +48,21 @@ $api->version('v1', function ($api){
         $api->post('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
     });
 
+    $api->group(['prefix' => 'api/user'], function ($api) {
+        $api->post('', 'App\Http\Controllers\UserController@create');
+        $api->put('{id}', 'App\Http\Controllers\UserController@update')->where('id', '[0-9]+');
+        $api->get('{id}', 'App\Http\Controllers\UserController@show')->where('id', '[0-9]+');
+        $api->get('', 'App\Http\Controllers\UserController@index');
+    });  
+
     $api->group(['middleware' => ['role:admin'], 'prefix' => 'admin'], 
         function ($api){
             $api->get('/home', 'App\Http\Controllers\Admin\AdminOperatorController@index');
+            $api->group(['middleware' => ['role:admin'], 'prefix' => 'accounts'], 
+                function ($api){
+                   $api->resource('departament', DepartamentController::class);
+                    $api->resource('admin', AdminAccountController::class);
+            });
     });
-
-    
 
 });
