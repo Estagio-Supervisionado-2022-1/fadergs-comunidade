@@ -2,25 +2,21 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Classes\AddressData;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Address;
-use Canducci\ZipCode\Facades\ZipCode;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Classes\AddressData;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Tymon\JWTAuth\Exceptions\JWTException;
 
-class AddressManagementController extends Controller
+class SecondaryAddressManagementController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request){
-        
+    public function index(Request $request)
+    {
+
         $addressData = new AddressData();
 
         $validatorReturn = Validator::make(
@@ -36,28 +32,30 @@ class AddressManagementController extends Controller
         }
 
         if ( $request->pagination) {
-            $addresses = $addressData->getAddressData ($request->pagination);
+            $addresses = $addressData->getSecondaryAddressesData ($request->pagination);
         }
         else {
-            $addresses = $addressData->getAddressData(10);
+            $addresses = $addressData->getSecondaryAddressesData(10);
         }
 
         return response()->json([
             'addresses' => $addresses,
         ]);
     }
+
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $addressData = new addressData();
 
         $validatorReturn = Validator::make(
             $request->all(), 
-            $addressData->getStoreSecondaryRulesToValidate(), 
+            $addressData->getStoreRulesToValidate(), 
             $addressData->getErrorMessagesToValidate()
         );
 
@@ -87,7 +85,6 @@ class AddressManagementController extends Controller
 
         return response()->json(['message_success' => 'Endereço criado com sucesso!'])
                             ->setStatusCode(201);
-
     }
 
     /**
@@ -96,12 +93,9 @@ class AddressManagementController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id){
-        if (! $address = Address::where('id', $id)->with('secondary_addresses')->first()) {
-            throw new NotFoundHttpException('Endereço não encontrado com o id = ' . $id);
-        }
-
-        return response()->json($address)->setStatusCode(200);
+    public function show($id)
+    {
+        //
     }
 
     /**
@@ -111,10 +105,9 @@ class AddressManagementController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id) {
-
-        return response()->json(['message' => 'Não autorizado']);
-
+    public function update(Request $request, $id)
+    {
+        //
     }
 
     /**
@@ -125,15 +118,6 @@ class AddressManagementController extends Controller
      */
     public function destroy($id)
     {
-        if (! $address = Address::find($id)) {
-            throw new NotFoundHttpException('Endereço não encontrado com o id = ' . $id);
-        }
-        try {
-                $address->delete();
-                return response()->json(['message' => 'Endereço desativado com sucesso']);
-                        
-        } catch (HttpException $e) {
-            throw $e;
-        }
+        //
     }
 }

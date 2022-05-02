@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ManagerAccountController;
 use App\Http\Controllers\Admin\StudentAccountController;
 use App\Http\Controllers\Admin\ServiceManagementController;
 use App\Http\Controllers\Admin\AddressManagementController;
+use App\Http\Controllers\Admin\SecondaryAddressManagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -58,7 +59,11 @@ $api->version('v1', function ($api){
             });
 
             $api->resource('service', ServiceManagementController::class);
-            $api->resource('address', AddressManagementController::class);
+            $api->resource('addresses', AddressManagementController::class);
+            $api->group(['prefix' => 'address'], function ($api){
+                $api->resource('secondary', SecondaryAddressManagementController::class);
+            });
+
 
             $api->group(['prefix' => 'accounts'], 
                 function ($api){

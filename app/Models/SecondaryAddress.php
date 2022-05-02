@@ -26,6 +26,6 @@ class SecondaryAddress extends Model
     ];
 
     public function addresses() {
-        return $this->hasMany(Address::class, 'id', 'address_id');
+        return $this->belongsTo(Address::class, 'address_id', 'id');
     }
 }
