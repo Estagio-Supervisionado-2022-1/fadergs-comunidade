@@ -45,10 +45,9 @@ class AddressData {
         return [
             'building_number' => [
                 'required',
-                'string',
-                'numeric',
+                'integer',
                 'min:1',
-                'max:7'
+                'max:99999999'
             ],
             'floor' => [
                 'string',
@@ -60,15 +59,18 @@ class AddressData {
                 'string',
                 'required',
                 'min:1',
+                'max:50'
             ],
             'description' => [
                 'string',
-                'min:3'
+                'min:3',
+                'max:100'
             ],
-            'address_id' => [
+            'zipcode' => [
                 'required',
-                'integer',
-            ],
+                'min:8',
+                'max:9'
+            ]
         ];
     }
 
@@ -90,6 +92,7 @@ class AddressData {
             'building_number.min' => 'O campo precisa conter no mínimo 1 carater',
             'building_number.max' => 'O campo precisa conter no máximo 7 carateres',
             'room.min' => 'O campo precisa conter no mínimo 1 carater',
+            'room.max' => 'O campo precisa conter no máximo 50 carateres',
             'string' => 'O campo precisa ser uma string',
             'zipcode.min' => 'O campo precisa conter no mínimo 8 carateres',
             'zipcode.max' => 'O campo excedeu 9 caracteres',
@@ -97,6 +100,7 @@ class AddressData {
             'floor.min' => 'O campo precisa conter no mínimo 1 caracter',
             'floor.max' => 'O campo precisa conter no máximo 2 caracteres',
             'description.min' => 'O campo precisa conter no mínimo 3 caracteres',
+            'description.max' => 'O campo precisa conter no máximo 100 caracteres',
             'integer' => 'O campo precisa ser um número inteiro',
             'passwordReset.accepted' => 'Os parâmetros fornecidos não estão corretos'
         ];
