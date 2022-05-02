@@ -5,7 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Classes\AddressData;
+use App\Models\Address;
+use App\Models\SecondaryAddress;
+use Canducci\ZipCode\Facades\ZipCode;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class SecondaryAddressManagementController extends Controller
 {
@@ -55,7 +60,7 @@ class SecondaryAddressManagementController extends Controller
 
         $validatorReturn = Validator::make(
             $request->all(), 
-            $addressData->getStoreRulesToValidate(), 
+            $addressData->getStoreSecondaryRulesToValidate(), 
             $addressData->getErrorMessagesToValidate()
         );
 
@@ -68,13 +73,14 @@ class SecondaryAddressManagementController extends Controller
         try {
 
             $zipCodeInfo = ZipCode::find($request->zipcode)->getObject();
+            $address = Address::where('zipcode', $zipCodeInfo->cep)->first();
 
-            Address::withTrashed()->firstOrCreate([
-                'zipcode'              => $zipCodeInfo->cep,
-                'streetName'    => $zipCodeInfo->logradouro,
-                'district'      => $zipCodeInfo->bairro,
-                'city'          => $zipCodeInfo->localidade,
-                'stateAbbr'     => $zipCodeInfo->uf,
+            $secondary = SecondaryAddress::withTrashed()->firstOrCreate([
+                'building_number'              => $request->building_number,
+                'floor'    => $request->floor,
+                'room'      => $request->room,
+                'description'          => $request->description,
+                'address_id'     => $address->id,
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]);
@@ -95,7 +101,11 @@ class SecondaryAddressManagementController extends Controller
      */
     public function show($id)
     {
-        //
+        if (! $secondary_address = SecondaryAddress::where('id', $id)->with('addresses')->first()) {
+            throw new NotFoundHttpException('Endereço não encontrado com o id = ' . $id);
+        }
+
+        return response()->json($secondary_address)->setStatusCode(200);
     }
 
     /**
@@ -107,7 +117,123 @@ class SecondaryAddressManagementController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $addressData = new AddressData();
+
+        if (! $secondaryAddress = SecondaryAddress::where('id', $id)->with('addresses')->first()) {
+            throw new NotFoundHttpException('Serviço não encontrado com o id = ' . $id);
+        }
+            if (!empty($request->building_number)){
+                $validatorReturn = Validator::make($request->all(), [
+                    'building_number' => [
+                        'required',
+                        'integer',
+                        'min:1',
+                        'max:99999999'
+                        ],
+                    ], $addressData->getErrorMessagesToValidate());
+            
+
+                if ($validatorReturn->fails()){
+                    return response()->json(['errors' => $validatorReturn->errors()]);
+                }
+
+                $secondaryAddress->updateOrCreate(['id' => $secondaryAddress->id], [
+                    'building_number' => $request->building_number,
+                ]);
+
+            }
+
+            if (!empty($request->floor)){
+                $validatorReturn = Validator::make($request->all(), [
+                    'floor' => [
+                        'required',
+                        'string',
+                        'min:1',
+                        'max:2'
+                    ],
+                ], $addressData->getErrorMessagesToValidate());
+            
+            if ($validatorReturn->fails()){
+                return response()->json(['errors' => $validatorReturn->errors()]);
+            }
+
+            
+            $secondaryAddress->updateOrCreate(['id' => $id], [
+                'floor' => $request->floor,
+            ]);
+
+        }
+
+            if (!empty($request->room)){
+                $validatorReturn = Validator::make($request->all(), [
+                    'room' => [
+                        'string',
+                        'required',
+                        'min:1',
+                        'max:50'
+                    ],
+                ], $addressData->getErrorMessagesToValidate());
+            
+
+                if ($validatorReturn->fails()){
+                    return response()->json(['errors' => $validatorReturn->errors()]);
+                }
+                
+                $secondaryAddress->updateOrCreate(['id' => $id], [
+                    'room' => $request->room,
+                ]);
+            }
+        
+            if (!empty($request->description)){
+                $validatorReturn = Validator::make($request->all(), [
+                    'description' => [
+                        'required',
+                        'string',
+                        'min:3',
+                        'max:100'
+                    ],
+                ], $addressData->getErrorMessagesToValidate());
+            
+
+                if ($validatorReturn->fails()){
+                    return response()->json(['errors' => $validatorReturn->errors()]);
+                }
+
+                
+                $secondaryAddress->updateOrCreate(['id' => $id], [
+                    'description' => $request->description,
+                ]);
+            }
+            if (!empty($request->address_id)){
+                $validatorReturn = Validator::make($request->all(), [
+                    'address_id' => [
+                        'required',
+                        'integer',
+                    ],
+                ], $addressData->getErrorMessagesToValidate());
+            
+
+                if ($validatorReturn->fails()){
+                    return response()->json(['errors' => $validatorReturn->errors()]);
+                }
+
+                if (! $address = Address::find($request->address_id)){
+                    throw new NotFoundHttpException('Endereço não encontrado com o id = ' . $request->departament_id);
+                }
+
+
+                $secondaryAddress->updateOrCreate(['id' => $id], [
+                    'address_id' => $request->address_id,
+                ]);
+            
+        }
+        $response = [
+            'message' => 'Serviço atualizado com sucesso',
+            'id' => $id
+        ];
+
+            return response()->json($response)->setStatusCode(200);
+
     }
 
     /**
@@ -116,8 +242,16 @@ class SecondaryAddressManagementController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        //
+    public function destroy($id){
+        if (! $secondaryAddress = SecondaryAddress::find($id)) {
+            throw new NotFoundHttpException('Sala não encontrada com o id = ' . $id);
+        }
+        try {
+                $secondaryAddress->delete();
+                return response()->json(['message' => 'Serviço desativado com sucesso']);
+                        
+        } catch (HttpException $e) {
+            throw $e;
+        }
     }
 }

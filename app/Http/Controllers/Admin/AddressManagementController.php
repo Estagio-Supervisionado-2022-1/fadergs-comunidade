@@ -57,7 +57,7 @@ class AddressManagementController extends Controller
 
         $validatorReturn = Validator::make(
             $request->all(), 
-            $addressData->getStoreSecondaryRulesToValidate(), 
+            $addressData->getStoreRulesToValidate(), 
             $addressData->getErrorMessagesToValidate()
         );
 

@@ -18,7 +18,8 @@ class SecondaryAddress extends Model
         'building_number',
         'floor', 
         'room', 
-        'description','address_id'
+        'description',
+        'address_id'
     ];
 
     protected $hidden = [

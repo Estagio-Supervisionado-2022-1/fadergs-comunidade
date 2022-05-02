@@ -15,7 +15,7 @@ class CreateSecondaryAddressesTable extends Migration
     {
         Schema::create('secondary_addresses', function (Blueprint $table) {
             $table->id();
-            $table->string('building_number', 8);
+            $table->unsignedBigInteger('building_number');
             $table->string('floor', 2)->nullable();
             $table->string('room', 50)->nullable();
             $table->string('description', 100)->nullable();

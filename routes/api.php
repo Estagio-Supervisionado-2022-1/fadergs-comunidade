@@ -55,7 +55,11 @@ $api->version('v1', function ($api){
             $api->group(['prefix' => 'restore'], function ($api){
                 $api->post('operator', 'App\Http\Controllers\Admin\AdminOperatorController@restoreOperator');
                 $api->post('service', 'App\Http\Controllers\Admin\AdminOperatorController@restoreService');
-                $api->post('address', 'App\Http\Controllers\Admin\AdminOperatorController@restoreAddress');
+                $api->post('addresses', 'App\Http\Controllers\Admin\AdminOperatorController@restoreAddress');
+                $api->group(['prefix' => 'address'], function ($api){
+                    $api->post('secondary', 'App\Http\Controllers\Admin\AdminOperatorController@restoreAddress');
+                });
+                
             });
 
             $api->resource('service', ServiceManagementController::class);
