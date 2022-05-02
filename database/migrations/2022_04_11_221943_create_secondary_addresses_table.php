@@ -37,6 +37,6 @@ class CreateSecondaryAddressesTable extends Migration
      */
     public function down()
     {   
-        Schema::dropIfExists('secondary_address');
+        Schema::dropIfExists('secondary_addresses');
     }
 }

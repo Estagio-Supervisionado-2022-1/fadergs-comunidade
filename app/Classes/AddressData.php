@@ -3,13 +3,14 @@
 namespace App\Classes;
 
 use App\Models\Address;
+use App\Models\SecondaryAddress;
 use Illuminate\Validation\Rule;
 
 class AddressData {
 
     public function getAddressData ($pagination){
         $addresses = Address::all()->isEmpty() ?
-                            ['address_error' => 'Não existem Endereços cadastrados'] :
+                            ['address_error' => 'Não existem salas cadastradas'] :
                             Address::paginate($pagination);
 
         return $addresses;  
@@ -17,9 +18,17 @@ class AddressData {
 
     public function getCountAddresses (){
         $addresses = Address::count() == 0 ?
-                                ['address_error' => 'Não existem Endereços cadastrados'] :
+                                ['address_error' => 'Não existem salas cadastradas'] :
                                 ['address_count' => Address::count()];
         return $addresses;
+    }
+
+    public function getSecondaryAddressesData ($pagination){
+        $secondaryAdresses = SecondaryAddress::all()->isEmpty() ?
+                                ['address_error' => 'Não existem salas cadastrados'] :
+                                SecondaryAddress::paginate($pagination);
+        return $secondaryAdresses;
+
     }
 
     //===============================VALIDATORS=========================
@@ -28,6 +37,37 @@ class AddressData {
             'pagination' => [
                 'integer',
                 Rule::in([10, 25, 50, 100])
+            ],
+        ];
+    }
+
+    public function getStoreSecondaryRulesToValidate () {
+        return [
+            'building_number' => [
+                'required',
+                'string',
+                'numeric',
+                'min:1',
+                'max:7'
+            ],
+            'floor' => [
+                'string',
+                'numeric',
+                'min:1',
+                'max:2'
+            ],
+            'room' => [
+                'string',
+                'required',
+                'min:1',
+            ],
+            'description' => [
+                'string',
+                'min:3'
+            ],
+            'address_id' => [
+                'required',
+                'integer',
             ],
         ];
     }
@@ -47,9 +87,16 @@ class AddressData {
     public function getErrorMessagesToValidate(){
         return [
             'required' => 'O campo é obrigatório',
-            'name.string' => 'O campo precisa ser uma string',
-            'min' => 'O campo precisa conter no mínimo 8 carateres',
-            'max' => 'O campo excedeu 9 caracteres',
+            'building_number.min' => 'O campo precisa conter no mínimo 1 carater',
+            'building_number.max' => 'O campo precisa conter no máximo 7 carateres',
+            'room.min' => 'O campo precisa conter no mínimo 1 carater',
+            'string' => 'O campo precisa ser uma string',
+            'zipcode.min' => 'O campo precisa conter no mínimo 8 carateres',
+            'zipcode.max' => 'O campo excedeu 9 caracteres',
+            'numeric' => 'O campo precisa ser um número',
+            'floor.min' => 'O campo precisa conter no mínimo 1 caracter',
+            'floor.max' => 'O campo precisa conter no máximo 2 caracteres',
+            'description.min' => 'O campo precisa conter no mínimo 3 caracteres',
             'integer' => 'O campo precisa ser um número inteiro',
             'passwordReset.accepted' => 'Os parâmetros fornecidos não estão corretos'
         ];
