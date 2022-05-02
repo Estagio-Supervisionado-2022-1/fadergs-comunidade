@@ -15,13 +15,11 @@ class CreateAddressesTable extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->string('cep', 15)->unique();
-            $table->string('logradouro', 255);
-            $table->string('numero', 6);
-            $table->string('bairro', 100);
-            $table->string('cidade', 70);
-            $table->string('uf', 2);
-            $table->string('complemento', 150);
+            $table->string('zipcode', 15)->unique();
+            $table->string('streetName', 255);
+            $table->string('district', 100);
+            $table->string('city', 70);
+            $table->string('stateAbbr', 2);
             $table->timestamps();
             $table->softDeletes();
         });
