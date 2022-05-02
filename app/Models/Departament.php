@@ -4,21 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Departament extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
+
+    protected $softDelete = true;
 
     protected $hidden = [
         'created_at', 'updated_at', 'deleted_at'
     ];
 
     public function Operator (){
-        return $this->belongsTo(Operator::class, 'departament_id');
+        return $this->hasMany(Operator::class, 'departament_id');
     }
 
     public function Services () {
-        return $this->hasMany(Services::class, 'id');
+        return $this->hasMany(Services::class, 'departament_id');
     }
 
     

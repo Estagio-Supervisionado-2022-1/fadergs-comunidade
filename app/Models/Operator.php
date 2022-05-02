@@ -2,10 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Spatie\Permission\Traits\HasRoles;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,7 +26,7 @@ class Operator extends Authenticatable implements JWTSubject
     ];
 
     public function Departament () {
-        return $this->hasMany(Departament::class, 'id');
+        return $this->belongsTo(Departament::class, 'id');
     }
 
     public function setPasswordAttribute($password){

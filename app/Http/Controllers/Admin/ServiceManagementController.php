@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Departament;
 use App\Models\Service;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
