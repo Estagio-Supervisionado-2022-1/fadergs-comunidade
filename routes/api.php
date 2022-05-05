@@ -68,12 +68,9 @@ $api->version('v1', function ($api){
             $api->group(['prefix' => 'restore'], function ($api){
                 $api->post('operator', 'App\Http\Controllers\Admin\AdminOperatorController@restoreOperator');
                 $api->post('service', 'App\Http\Controllers\Admin\AdminOperatorController@restoreService');
-                $api->post('addresses', 'App\Http\Controllers\Admin\AdminOperatorController@restoreAddress');
-                $api->group(['prefix' => 'address'], function ($api){
-                    $api->post('secondary', 'App\Http\Controllers\Admin\AdminOperatorController@restoreAddress');
-                });
                 
             });
+    
 
             $api->resource('service', ServiceManagementController::class);
             $api->resource('addresses', AddressManagementController::class);
@@ -90,5 +87,15 @@ $api->version('v1', function ($api){
                     $api->resource('student', StudentAccountController::class);
             });
     });
+
+    $api->group(['middleware' => ['role:admin|manager'], 'prefix' => 'address'],
+        function ($api){
+            $api->group(['prefix' => 'restore'], function ($api){
+                $api->post('mainaddress', 'App\Http\Controllers\Admin\AdminOperatorController@restoreAddress');
+                $api->post('secondaryaddress', 'App\Http\Controllers\Admin\AdminOperatorController@restoreSecondaryAddress');
+            });
+        });
+
+    
 
 });

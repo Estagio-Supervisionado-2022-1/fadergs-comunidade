@@ -17,6 +17,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Faker\Factory as Faker;
 use App\Mail\OperatorAccountResetPassword;
+use App\Models\SecondaryAddress;
 use Canducci\ZipCode\Facades\ZipCode;
 use Illuminate\Support\Facades\Mail;
 
@@ -48,7 +49,7 @@ class AdminOperatorController extends Controller
         $services = $serviceData->getCountServices();
 
         $departaments = $departamentData->getCountDepartaments();
-
+        
 
         return response()->json([
             'administrators' => $administrators,
@@ -113,8 +114,8 @@ class AdminOperatorController extends Controller
 
     public function restoreAddress (Request $request){
 
-        $zipCodeInfo = ZipCode::find($request->zipcode)->getObject();
-
+        $zipCodeInfo = ZipCode::find($request->zipcode, true)->getObject();
+        
         if (! $address = Address::onlyTrashed()
             ->where('zipcode', $zipCodeInfo->cep)
             ->first()){
@@ -122,6 +123,19 @@ class AdminOperatorController extends Controller
         }
         
         $address->restore();
+
+        return response()->json(['message_success' => 'Serviço restaurado com sucesso']);
+    }
+
+    public function restoreSecondaryAddress (Request $request){
+
+        if (! $secondaryAddress = SecondaryAddress::onlyTrashed()
+            ->where('room', $request->room)
+            ->first()){
+                throw new NotFoundHttpException('Endereço não encontrado com o cep = ' . $request->zipcode);
+        }
+        
+        $secondaryAddress->restore();
 
         return response()->json(['message_success' => 'Serviço restaurado com sucesso']);
     }
