@@ -69,7 +69,7 @@ class AddressManagementController extends Controller
 
         try {
 
-            $zipCodeInfo = ZipCode::find($request->zipcode)->getObject();
+            $zipCodeInfo = ZipCode::find($request->zipcode, true)->getObject();
 
             Address::withTrashed()->firstOrCreate([
                 'zipcode'              => $zipCodeInfo->cep,

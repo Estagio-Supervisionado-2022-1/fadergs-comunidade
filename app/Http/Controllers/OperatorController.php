@@ -78,6 +78,7 @@ class OperatorController extends Controller
             throw $e;
         }
 
+
         
         return $this->respondWithToken($token);
 

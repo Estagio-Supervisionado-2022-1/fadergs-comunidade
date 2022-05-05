@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Operator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -47,8 +48,14 @@ class AuthController extends Controller
         } catch (JWTException $e) {
             throw $e;
         }
+        $operator = auth()->user();
+        $operator->userRole = Operator::find($operator->id)->getRoleNames()[0];
+
+        return response()->json([
+            'user'=> $operator,
+            'token' => $this->respondWithToken($token),
+        ]);
         
-        return $this->respondWithToken($token);
     }
 
     public function refresh (){
