@@ -10,6 +10,8 @@ class Departament extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $softDelete = true;
+
     protected $fillable = ['name'];
 
     public static $attrMakeHidden = ['id', 'updated_at', 'created_at', 'deleted_at'];
@@ -51,6 +53,10 @@ class Departament extends Model
            ]);
         });
     }
+    public function Services () {
+        return $this->hasMany(Services::class, 'departament_id');
+    }
+
     
     public function Operator (){
         return $this->belongsTo(Operator::class, 'departament_id');

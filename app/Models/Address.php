@@ -4,10 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 
 class Address extends Model
 {
-    protected $fillable = ['cep', 'logradouro', 'bairro', 'localidade', 'cidade','numero', 'uf', 'complemento'];
+    use SoftDeletes;
+    
+    protected $fillable = ['zipcode', 'streetName', 'district', 'city', 'stateAbbr'];
+
+    public function secondary_addresses (){
+        return $this->hasMany(SecondaryAddress::class, 'address_id');
+    }
 }

@@ -2,6 +2,11 @@
 
 use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\DepartamentController;
+use App\Http\Controllers\Admin\ManagerAccountController;
+use App\Http\Controllers\Admin\StudentAccountController;
+use App\Http\Controllers\Admin\ServiceManagementController;
+use App\Http\Controllers\Admin\AddressManagementController;
+use App\Http\Controllers\Admin\SecondaryAddressManagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -60,11 +65,37 @@ $api->version('v1', function ($api){
     $api->group(['middleware' => ['role:admin'], 'prefix' => 'admin'], 
         function ($api){
             $api->get('/home', 'App\Http\Controllers\Admin\AdminOperatorController@index');
-            $api->group(['middleware' => ['role:admin'], 'prefix' => 'accounts'], 
+            $api->group(['prefix' => 'restore'], function ($api){
+                $api->post('operator', 'App\Http\Controllers\Admin\AdminOperatorController@restoreOperator');
+                $api->post('service', 'App\Http\Controllers\Admin\AdminOperatorController@restoreService');
+                
+            });
+    
+
+            $api->resource('service', ServiceManagementController::class);
+            $api->resource('addresses', AddressManagementController::class);
+            $api->group(['prefix' => 'address'], function ($api){
+                $api->resource('secondary', SecondaryAddressManagementController::class);
+            });
+
+
+            $api->group(['prefix' => 'accounts'], 
                 function ($api){
                    $api->resource('departament', DepartamentController::class);
                     $api->resource('admin', AdminAccountController::class);
+                    $api->resource('manager', ManagerAccountController::class);
+                    $api->resource('student', StudentAccountController::class);
             });
     });
+
+    $api->group(['middleware' => ['role:admin|manager'], 'prefix' => 'address'],
+        function ($api){
+            $api->group(['prefix' => 'restore'], function ($api){
+                $api->post('mainaddress', 'App\Http\Controllers\Admin\AdminOperatorController@restoreAddress');
+                $api->post('secondaryaddress', 'App\Http\Controllers\Admin\AdminOperatorController@restoreSecondaryAddress');
+            });
+        });
+
+    
 
 });

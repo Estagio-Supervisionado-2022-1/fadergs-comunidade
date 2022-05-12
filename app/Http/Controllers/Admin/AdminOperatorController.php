@@ -11,10 +11,15 @@ use App\Models\Address;
 use App\Models\Departament;
 use App\Models\Operator;
 use App\Models\Service;
-use Dingo\Api\Exception\ValidationHttpException;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Spatie\Permission\Traits\HasRoles;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Faker\Factory as Faker;
+use App\Mail\OperatorAccountResetPassword;
+use App\Models\SecondaryAddress;
+use Canducci\ZipCode\Facades\ZipCode;
+use Illuminate\Support\Facades\Mail;
 
 class AdminOperatorController extends Controller
 {
@@ -44,7 +49,7 @@ class AdminOperatorController extends Controller
         $services = $serviceData->getCountServices();
 
         $departaments = $departamentData->getCountDepartaments();
-
+        
 
         return response()->json([
             'administrators' => $administrators,
@@ -57,51 +62,81 @@ class AdminOperatorController extends Controller
         
     }
 
+    public function restoreOperator (Request $request) {
+        if ( $operator = Operator::onlyTrashed()
+            ->where('email', $request->email)
+            ->with('roles', 'Departament', 'permissions')
+            ->get()) {
+                throw new NotFoundHttpException('Operador não encontrado com o email = ' . $request->email);
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        try {
+            $operator->restore();
+
+            $faker = Faker::create();
+            $password = $faker->password(8,12);
+
+            $operator->updateOrCreate(['id' => $operator->id], [
+                'password' => $password,
+            ]);
+
+            $loginData = [
+                'admin_login' => $operator->email,
+                'admin_password' => $password
+            ];
+
+            Mail::to($operator->email)
+                ->send(new OperatorAccountResetPassword ($loginData));  
+        
+            return response()->json(['message_success' => 'Operador reativado com sucesso, uma nova senha foi enviada ao e-mail']);
+        } catch (HttpException $e) {
+            throw $e;
+        }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
+    public function restoreService (Request $request){
+        if (! $service = Service::onlyTrashed()
+            ->where('name', $request->name)
+            ->first()){
+                throw new NotFoundHttpException('Serviço não encontrado com o nome = ' . $request->name);
+        }
+
+        if (! Departament::onlyTrashed()
+            ->where('id', $service->departament_id)
+            ->get()){
+                throw new NotFoundHttpException('O serviço ao qual o departamento está associado, encontra-se desabilitado');
+            }
+        
+        $service->restore();
+
+        return response()->json(['message_success' => 'Serviço restaurado com sucesso']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
+    public function restoreAddress (Request $request){
+
+        $zipCodeInfo = ZipCode::find($request->zipcode, true)->getObject();
+        
+        if (! $address = Address::onlyTrashed()
+            ->where('zipcode', $zipCodeInfo->cep)
+            ->first()){
+                throw new NotFoundHttpException('Endereço não encontrado com o cep = ' . $request->zipcode);
+        }
+        
+        $address->restore();
+
+        return response()->json(['message_success' => 'Serviço restaurado com sucesso']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+    public function restoreSecondaryAddress (Request $request){
 
-    
+        if (! $secondaryAddress = SecondaryAddress::onlyTrashed()
+            ->where('room', $request->room)
+            ->first()){
+                throw new NotFoundHttpException('Endereço não encontrado com o cep = ' . $request->zipcode);
+        }
+        
+        $secondaryAddress->restore();
+
+        return response()->json(['message_success' => 'Serviço restaurado com sucesso']);
+    }
 }

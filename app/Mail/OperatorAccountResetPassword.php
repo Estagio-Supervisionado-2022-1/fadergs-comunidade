@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class AdminAccountResetPassword extends Mailable
+class OperatorAccountResetPassword extends Mailable
 {
     use Queueable, SerializesModels;
 
