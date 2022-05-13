@@ -34,9 +34,10 @@ $api->version('v1', function ($api){
     });
 
     $api->group(['prefix'=> 'auth'], function ($api){
-        $api->post('/operator/login', 'App\Http\Controllers\Auth\AuthController@login');
+        $api->post('/operator/login', 'App\Http\Controllers\Auth\AuthController@operatorLogin');
+        $api->post('/user/login', 'App\Http\Controllers\Auth\AuthController@userLogin');
         
-        $api->group(['middleware' => 'api.auth', 'prefix' => 'operator'], function ($api){
+        $api->group(['middleware' => 'api.auth'], function ($api){
             $api->post('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
             $api->post('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
         });
@@ -57,7 +58,8 @@ $api->version('v1', function ($api){
                 $api->post('service', 'App\Http\Controllers\Admin\AdminOperatorController@restoreService');
                 
             });
-    
+            
+            $api->post('appointment', 'App\Http\Controllers\AppointmentManagementController@index');
 
             $api->resource('service', ServiceManagementController::class);
             $api->resource('addresses', AddressManagementController::class);

@@ -12,6 +12,7 @@ class Operator extends Authenticatable implements JWTSubject
     use HasRoles, SoftDeletes;
 
     protected $softDelete = true;
+    protected $guard_name = 'api';
     
     protected $fillable = [
         'name',

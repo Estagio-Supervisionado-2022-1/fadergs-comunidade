@@ -7,10 +7,13 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Faker\Factory as Faker;
+use Spatie\Permission\Traits\HasRoles;
 
 class UserSeeder extends Seeder
 {
+    use HasRoles;
     /**
+     * 
      * Run the database seeds.
      *
      * @return void
@@ -23,13 +26,15 @@ class UserSeeder extends Seeder
 
         for ($i = 0; $i < $NUMBER_OF_RECORDS ; $i++){
 
-            User::insert([
+            $user = User::insert([
                 'name'              => $faker->name,
                 'email'             => $faker->safeEmail,
                 'password'          => bcrypt('Brasil@10a'),
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]);
+
+            User::find($i+1)->assignRole('user');
         }
 
     }
