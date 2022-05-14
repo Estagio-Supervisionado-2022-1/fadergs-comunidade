@@ -30,6 +30,8 @@ class UserSeeder extends Seeder
                 'name'              => $faker->name,
                 'email'             => $faker->safeEmail,
                 'password'          => bcrypt('Brasil@10a'),
+                'cpf'               => '0'.$faker->isbn10,
+                'telphone'          => $faker->e164PhoneNumber,
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]);

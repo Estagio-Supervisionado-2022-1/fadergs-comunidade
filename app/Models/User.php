@@ -23,6 +23,8 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'cpf', 
+        'telphone'
     ];
 
     protected $guard = 'api_users';

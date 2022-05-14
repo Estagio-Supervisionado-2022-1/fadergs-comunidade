@@ -19,7 +19,7 @@ class Appointment extends Model
     }
 
     public function operators () {
-        return $this->belongsToMany(Operator::class,'appointment_operator', 'appointment_id', 'user_id' );
+        return $this->belongsTo(Operator::class);
     }
 
     public function users (){

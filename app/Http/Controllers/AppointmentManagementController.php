@@ -6,6 +6,7 @@ use App\Classes\AppointmentData;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
+
 class AppointmentManagementController extends Controller
 {
     /**
@@ -27,20 +28,19 @@ class AppointmentManagementController extends Controller
                 'appointment_errors' => $validationReturn->errors()
             ]);
         }
-        $user = auth()->user();
 
         //=======================USER==========================
-        if ($user->roles[0]->name == 'user') {
+        if (auth()->guard('api_users')->check()){
             if (! $request->pagination) {
-                $appointments = $appointmentData->getAppointmentsDataByUser($DEFAULT_PAGINATION, $user);
+                $appointments = $appointmentData->getAppointmentsDataByUser($DEFAULT_PAGINATION, auth()->user());
                 return response()->json(['appointments' => $appointments]);
             }
-            $appointments = $appointmentData->getAppointmentsDataByUser($request->pagination, $user);
+            $appointments = $appointmentData->getAppointmentsDataByUser($request->pagination, auth()->user());
             return response()->json(['appointments' => $appointments]);
-        }
+        } 
 
         //======================ADMIN==========================
-        if ($user->roles[0]->name == 'admin') {
+        elseif (auth()->guard('api')->check()){
             if (! $request->pagination) {
                 $appointments = $appointmentData->getAppointmentsData($DEFAULT_PAGINATION);
                 return response()->json(['appointments' => $appointments]);
@@ -48,9 +48,8 @@ class AppointmentManagementController extends Controller
             $appointments = $appointmentData->getAppointmentsData($request->pagination);
             return response()->json(['appointments' => $appointments]);
         }
-
-        
     }
+
 
     /**
      * Store a newly created resource in storage.

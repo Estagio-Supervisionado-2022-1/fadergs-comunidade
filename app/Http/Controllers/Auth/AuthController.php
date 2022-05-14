@@ -59,37 +59,6 @@ class AuthController extends Controller
         
     }
 
-    public function refresh (){
-        try {
-            if(!$token = auth()->getToken()){
-                throw new NotFoundHttpException('Token não existe');
-            }
-
-            return $this->respondWithToken(auth()->refresh($token));
-
-        } catch (JWTException $e) {
-            throw $e;
-        }
-    }
-
-    public function logout (){
-        try {
-            auth()->logout();
-        } catch (JWTException $e) {
-            throw $e;
-        }
-        
-        return response()->json(['message' => 'Usuário deslogado com sucesso']);
-    }
-
-
-    private function respondWithToken($token){
-        return response()->json([
-            'access_token'      => $token,
-            'token_type'        => 'bearer',
-            'expires_in'        => auth()->factory()->getTTL() * 60,
-        ]);
-    }
 
     public function userLogin(Request $request){
 		$rulesToValidate = [
@@ -132,6 +101,38 @@ class AuthController extends Controller
         return response()->json([
             'user'=> $user,
             'token' => $this->respondWithToken($token),
+        ]);
+    }
+
+    public function refresh (){
+        try {
+            if(!$token = auth()->getToken()){
+                throw new NotFoundHttpException('Token não existe');
+            }
+
+            return $this->respondWithToken(auth()->refresh($token));
+
+        } catch (JWTException $e) {
+            throw $e;
+        }
+    }
+
+    public function logout (){
+        try {
+            auth()->logout();
+        } catch (JWTException $e) {
+            throw $e;
+        }
+        
+        return response()->json(['message' => 'Usuário deslogado com sucesso']);
+    }
+
+    
+    private function respondWithToken($token){
+        return response()->json([
+            'access_token'      => $token,
+            'token_type'        => 'bearer',
+            'expires_in'        => auth()->factory()->getTTL() * 60,
         ]);
     }
 }

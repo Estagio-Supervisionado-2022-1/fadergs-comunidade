@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\StudentAccountController;
 use App\Http\Controllers\Admin\ServiceManagementController;
 use App\Http\Controllers\Admin\AddressManagementController;
 use App\Http\Controllers\Admin\SecondaryAddressManagementController;
+use App\Http\Controllers\AppointmentManagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -36,6 +37,8 @@ $api->version('v1', function ($api){
     $api->group(['prefix'=> 'auth'], function ($api){
         $api->post('/operator/login', 'App\Http\Controllers\Auth\AuthController@operatorLogin');
         $api->post('/user/login', 'App\Http\Controllers\Auth\AuthController@userLogin');
+        $api->post('/user/signup', 'App\Http\Controllers\UserController@store');
+
         
         $api->group(['middleware' => 'api.auth'], function ($api){
             $api->post('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
@@ -58,8 +61,6 @@ $api->version('v1', function ($api){
                 $api->post('service', 'App\Http\Controllers\Admin\AdminOperatorController@restoreService');
                 
             });
-            
-            $api->post('appointment', 'App\Http\Controllers\AppointmentManagementController@index');
 
             $api->resource('service', ServiceManagementController::class);
             $api->resource('addresses', AddressManagementController::class);
@@ -84,6 +85,8 @@ $api->version('v1', function ($api){
             });
         });
 
-    
+    $api->group(['middleware' => 'api.auth'], function ($api){
+        $api->resource('appointments', AppointmentManagementController::class);
+    });
 
 });

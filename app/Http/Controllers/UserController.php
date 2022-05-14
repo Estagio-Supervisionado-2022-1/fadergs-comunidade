@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UserController extends Controller
 {
@@ -17,21 +21,15 @@ class UserController extends Controller
      */
     public function index()
     {
-        if(! $users =  User::all()){
-            throw new NotFoundHttpException('Usuários não encontrados');
+        if (! $user = auth()->guard('api_users')->user()){
+            return response()->json(['message_error' => 'Usuário não está logado'], 401);
         }
 
-        return $users;
-    }
+        $futureAppointmentsOfUser = Appointment::where('user_id', $user->id)
+                                            ->whereDate('datetime', '>=', Carbon::now()
+                                                                                    ->toDateString())
+                                            ->get();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        // 
     }
 
     /**
@@ -42,7 +40,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $rulesToValidate = [
+        $rulesToValidate= [
             'name'          => [
                 'required',
                 'string',
@@ -53,7 +51,16 @@ class UserController extends Controller
                 'required',
                 'email',
                 'max:255',
-                'unique:users,email'
+                'unique:operators,email'
+            ],
+            'cpf' => [
+                'required',
+                'string',
+                'regex:/^[0-9]{11}/'
+            ],
+            'telphone' => [
+                'string',
+                'min:11'
             ],
             'password'      => [
                 'required',
@@ -63,24 +70,50 @@ class UserController extends Controller
                             ->numbers()
                             ->symbols()
                             ->uncompromised()
-            ]
+            ],
         ];
+
         $validatorReturn = Validator::make($request->all(), $rulesToValidate);
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
             ]);
         }
-
         $user = User::create([
             'name'              => $request->name,
             'email'             => $request->email,
-            'password'          => Crypt::encrypt($request->password),
+            'password'          => $request->password,
+            'cpf'               => $request->cpf,
+            'telphone'          => $request->telphone,
             'created_at'        => now(),
             'updated_at'        => now(),
         ]);
 
-        return response()->json(['user'=>$user], 201);
+        $user->assignRole('user');
+        
+        try {
+            $token = auth()->login($user);
+        } catch (JWTException $e) {
+            throw $e;
+        }
+
+        $user = auth()->guard('api_users')->user();
+        $user->userRole = User::find($user->id)->getRoleNames()[0];
+
+        
+        return  response()->json([
+            'user' => $user,
+            'token' => $this->respondWithToken($token),
+        ]);
+
+    }
+
+    private function respondWithToken($token){
+        return response()->json([
+            'access_token'      => $token,
+            'token_type'        => 'bearer',
+            'expires_in'        => auth()->factory()->getTTL() * 60,
+        ]);
     }
 
     /**

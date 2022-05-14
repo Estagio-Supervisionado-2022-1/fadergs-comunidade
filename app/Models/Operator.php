@@ -30,6 +30,10 @@ class Operator extends Authenticatable implements JWTSubject
         return $this->belongsTo(Departament::class, 'id');
     }
 
+    public function appointment() {
+        return $this->hasMany(Appointment::class);
+    }
+
     public function setPasswordAttribute($password){
         if (!empty($password)){
             $this->attributes['password'] = bcrypt($password);
