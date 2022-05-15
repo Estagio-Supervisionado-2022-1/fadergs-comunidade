@@ -21,7 +21,7 @@ class UserController extends Controller
             throw new NotFoundHttpException('Usuários não encontrados');
         }
 
-        return $users;
+        return response()->json(['users'=>$users], 200);
     }
 
     /**
@@ -80,7 +80,7 @@ class UserController extends Controller
             'updated_at'        => now(),
         ]);
 
-        return response()->json(['user'=>$user], 201);
+        return response()->json($user, 201);
     }
 
     /**
@@ -161,7 +161,7 @@ class UserController extends Controller
             'updated_at' => now()
         ]);
 
-        return response()->json(['user'=>$user], 200);
+        return response()->json($user, 200);
     }
 
     /**

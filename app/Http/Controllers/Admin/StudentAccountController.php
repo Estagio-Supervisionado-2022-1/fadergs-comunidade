@@ -2,29 +2,30 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Classes\OperatorData;
 use App\Http\Controllers\Controller;
-use App\Mail\OperatorAccountCreation;
-use App\Mail\OperatorAccountResetPassword;
-use App\Models\Operator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use App\Mail\OperatorAccountCreation;
+use App\Mail\OperatorAccountResetPassword;
+use App\Models\Operator;
+use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Classes\OperatorData;
 
-class AdminAccountController extends Controller
+
+class StudentAccountController extends Controller
 {
-    /**
+   /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request){
-        $operatorData = new operatorData();
+        $operatorData = new OperatorData();
 
         $validatorReturn = Validator::make(
             $request->all(), 
@@ -39,14 +40,14 @@ class AdminAccountController extends Controller
         }
 
         if ( $request->pagination) {
-            $administrators = $operatorData->getDataAdminOperator($request->pagination);
+            $students = $operatorData->getDataStudentOperator($request->pagination);
         }
         else {
-            $administrators = $operatorData->getDataAdminOperator(10);
+            $students = $operatorData->getDataStudentOperator(10);
         }
 
         return response()->json([
-            'administrators' => $administrators
+            'students' => $students
         ]);
     }
     /**
@@ -56,14 +57,14 @@ class AdminAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request){
-        $operatorData = new operatorData();
+        $operatorData = new OperatorData();
 
         $validatorReturn = Validator::make(
             $request->all(), 
             $operatorData->getStoreRulesToValidate(), 
             $operatorData->getErrorMessagesToValidate()
         );
-        
+
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
@@ -74,7 +75,7 @@ class AdminAccountController extends Controller
             $faker = Faker::create();
             $password = $faker->password(8,12);
 
-            $administrator = Operator::withTrashed()->firstOrCreate([
+            $student = Operator::withTrashed()->firstOrCreate([
                 'name'              => $request->name,
                 'email'             => $request->email,
                 'password'          => $password,
@@ -89,13 +90,13 @@ class AdminAccountController extends Controller
             Mail::to($request->email)
                 ->send(new OperatorAccountCreation ($loginData));
     
-            $administrator->assignRole('admin');
+            $student->assignRole('student');
 
         } catch (JWTException $e) {
             throw $e;
         }
 
-        return response()->json(['message_success' => 'Administrador criado com sucesso!'])
+        return response()->json(['message_success' => 'Aluno criado com sucesso!'])
                             ->setStatusCode(201);
 
     }
@@ -110,9 +111,9 @@ class AdminAccountController extends Controller
 
         $operatorData = new OperatorData();
 
-        $administrator = $operatorData->getDataAdminById($id);
+        $student = $operatorData->getDataStudentById($id);
 
-        return response()->json($administrator)->setStatusCode(200);
+        return response()->json($student)->setStatusCode(200);
     }
 
     /**
@@ -126,7 +127,7 @@ class AdminAccountController extends Controller
 
         $operatorData = new OperatorData();
 
-        $administrator = $operatorData->getDataAdminById($id);        
+        $student = $operatorData->getDataStudentById($id);
 
             if (!empty($request->name)){
                 $validatorReturn = Validator::make($request->all(), [
@@ -143,7 +144,7 @@ class AdminAccountController extends Controller
                     return response()->json(['errors' => $validatorReturn->errors()]);
                 }
 
-                $administrator->updateOrCreate(['id' => $administrator->id], [
+                $student->updateOrCreate(['id' => $student->id], [
                     'name' => $request->name,
                 ]);
 
@@ -157,14 +158,14 @@ class AdminAccountController extends Controller
                         'max:255',
                         'unique:operators,email'
                     ],
-                ]);
+                ], $operatorData->getErrorMessagesToValidate());
             
 
                 if ($validatorReturn->fails()){
                     return response()->json(['errors' => $validatorReturn->errors()]);
                 }
 
-                $administrator->updateOrCreate(['id' => $administrator->id], [
+                $student->updateOrCreate(['id' => $student->id], [
                     'email' => $request->email,
                 ]);
 
@@ -184,7 +185,7 @@ class AdminAccountController extends Controller
                     return response()->json(['errors' => $validatorReturn->errors()]);
                 }
 
-                $administrator->updateOrCreate(['id' => $administrator->id], [
+                $student->updateOrCreate(['id' => $student->id], [
                     'departament_id' => $request->departament_id,
                 ]);
             }
@@ -205,26 +206,26 @@ class AdminAccountController extends Controller
                 $faker = Faker::create();
                 $password = $faker->password(8,12);
 
-                $administrator->updateOrCreate(['id' => $administrator->id], [
+                $student->updateOrCreate(['id' => $student->id], [
                     'password' => $password,
                 ]);
 
                 $loginData = [
-                    'admin_login' => $administrator->email,
+                    'admin_login' => $student->email,
                     'admin_password' => $password
                 ];
 
-                Mail::to($administrator->email)
+                Mail::to($student->email)
                     ->send(new OperatorAccountResetPassword ($loginData));  
             }
             
             $response = [
-                'message' => 'Administrador atualizado com sucesso',
+                'message' => 'Aluno atualizado com sucesso',
                 'id' => $id
             ];
 
             return response()->json($response)->setStatusCode(200);
-        
+      
     }
 
     /**
@@ -235,23 +236,19 @@ class AdminAccountController extends Controller
      */
     public function destroy($id)
     {
-        if (! $administrator = Operator::find($id)) {
+        if (! $student = Operator::find($id)) {
             throw new NotFoundHttpException('Operador não encontrado com o id = ' . $id);
         }
         try {
-            if ($administrator->hasRole('admin')){
-                $administrator->delete();
-                return response()->json(['message' => 'Administrador desativado com sucesso']);
+            if ($student->hasRole('student')){
+                $student->delete();
+                return response()->json(['message' => 'Aluno desativado com sucesso']);
             }
-
-            return response()->json(['message' => 'Administrador não encontrado com o id = ' . $id]);
+            return response()->json(['message' => 'Aluno não encontrado com o id = ' . $id]);
+            
             
         } catch (HttpException $e) {
             throw $e;
         }
-
-        
-
-        
     }
 }

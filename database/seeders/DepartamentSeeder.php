@@ -16,7 +16,7 @@ class DepartamentSeeder extends Seeder
     public function run()
     {
 
-        $departaments = ['NuPJur', 'NuPSau', 'NuPTecInfo', 'NuPCont'];
+        $departaments = ['NuPJur', 'NuPSau', 'NuPTecInfo', 'NuPCont', 'SysAdmin'];
 
         foreach ($departaments as $departament) {
             Departament::insert([

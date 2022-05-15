@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Appointment extends Model
 {
+    protected $softDelete = true;
     protected $fillable = ['status', 'datetime'];
 
     public function addresses (){

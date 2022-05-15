@@ -4,13 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Service extends Model
 {
-    protected $fillable = ['service', 'id_departament'];
+    use SoftDeletes;
+
+    protected $softDelete = true;
+
+    protected $fillable = ['id', 'name', 'departament_id'];
 
     public function departaments (){
-        return $this->hasMany(Departament::class, 'departament_id');
+        return $this->belongsTo(Departament::class, 'departament_id');
     }
 
 }
