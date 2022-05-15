@@ -20,9 +20,32 @@ class DepartamentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        $departaments = $this->modelDepartament->get();
+    public function index(Request $request)
+    {   
+        $modelDepartament = $this->modelDepartament;
+
+        if ($request->has('name')) {
+            $modelDepartament = $modelDepartament->where('name', 'like', '%'. trim($request->input('name') . '%'));
+        }
+
+        if (
+            $request->has('orderBy') 
+            && in_array($request->input('orderBy'), ['id', 'name'])
+        ) {
+            $modelDepartament = $modelDepartament->orderBy($request->input('orderBy'));
+        }
+        
+        if (
+            $request->has('paginateRows') 
+            && in_array($request->input('paginateRows'), [10, 25, 50, 100])
+        ) {
+            $paginateRows = $request->input('paginateRows');
+        } else {
+            $paginateRows = 10;
+        }
+
+        $departaments = $modelDepartament->paginate($paginateRows);
+
         return response()->json(
             $departaments, 
             $departaments->count() ? Response::HTTP_OK : Response::HTTP_NO_CONTENT
