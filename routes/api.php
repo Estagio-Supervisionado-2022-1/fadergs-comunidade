@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\SecondaryAddressManagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AppointmentControler;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,12 @@ $api->version('v1', function ($api){
         $api->post('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
         $api->post('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
     });
+
+    $api->group(['prefix' => ''], function ($api) {
+        $api->group(['middleware' => 'api.auth', 'prefix' => ''], function ($api){
+            Route::resource('/appointments', AppointmentControler::class);
+        });
+    }); 
 
     $api->group(['prefix' => ''], function ($api) {
         $api->post('/users', 'App\Http\Controllers\UserController@store');
