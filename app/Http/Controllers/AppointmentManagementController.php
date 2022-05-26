@@ -39,6 +39,7 @@ class AppointmentManagementController extends Controller
             return response()->json(['appointments' => $appointments]);
         } 
 
+
         //======================ADMIN==========================
         elseif (auth()->guard('api')->check()){
             if (! $request->pagination) {

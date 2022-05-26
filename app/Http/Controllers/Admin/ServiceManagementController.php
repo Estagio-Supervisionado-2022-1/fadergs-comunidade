@@ -42,6 +42,32 @@ class ServiceManagementController extends Controller
             $services = $serviceData->getServiceData(10);
         }
 
+        $data = [
+            [
+                'name' => 'teste1',
+                'departament_id' => 1
+            ],
+            [
+                'name' => 'teste1',
+                'departament_id' => 1
+            ],
+            [
+                'name' => 'teste1',
+                'departament_id' => 1
+            ],
+            [
+                'name' => 'teste1',
+                'departament_id' => 1
+            ],
+            [
+                'name' => 'teste1',
+                'departament_id' => 1
+            ],
+        ];
+
+        Service::insert($data);
+
+        
         return response()->json([
             'services' => $services
         ]);
