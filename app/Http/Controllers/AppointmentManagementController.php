@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\AppointmentData;
+use App\Models\Operator;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
@@ -60,7 +61,27 @@ class AppointmentManagementController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $operator = auth()->user();
+        $operator->userRole = Operator::find($operator->id)->getRoleNames()[0];
+
+        $appointmentData = new AppointmentData();
+
+        $validationReturn = Validator::make(
+            $request->all(),
+            $appointmentData->getStoreRulesToValidate()
+        );
+
+        if ($validationReturn->fails()){
+            return response()->json([
+                'validation errors' => $validationReturn->errors(), 
+            ])->setStatusCode(400);
+        }
+
+
+        
+
+        
+        
     }
 
     /**
