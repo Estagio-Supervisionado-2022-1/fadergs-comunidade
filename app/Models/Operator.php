@@ -11,7 +11,7 @@ use Illuminate\Notifications\Notifiable;
 
 class Operator extends Authenticatable implements JWTSubject
 {
-    use HasRoles, SoftDeletes;
+    use HasRoles, SoftDeletes, Notifiable;
 
     protected $softDelete = true;
     

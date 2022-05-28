@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rules\Password as PasswordRules;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserController extends Controller
 {
@@ -17,7 +19,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        if(! $users =  User::all()){
+        $users = User::all();
+
+        if (empty($users)) {
             throw new NotFoundHttpException('Usuários não encontrados');
         }
 
@@ -58,7 +62,7 @@ class UserController extends Controller
             'password'      => [
                 'required',
                 'string',
-                Password::min(8)
+                PasswordRules::min(8)
                             ->mixedCase()
                             ->numbers()
                             ->symbols()
@@ -75,7 +79,7 @@ class UserController extends Controller
         $user = User::create([
             'name'              => $request->name,
             'email'             => $request->email,
-            'password'          => Crypt::encrypt($request->password),
+            'password'          => $request->password,
             'created_at'        => now(),
             'updated_at'        => now(),
         ]);
@@ -92,6 +96,7 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::find($id);
+
         if (empty($user)) {
             return abort(404);
         }
@@ -134,7 +139,7 @@ class UserController extends Controller
             'password'      => [
                 'required',
                 'string',
-                Password::min(8)
+                PasswordRules::min(8)
                             ->mixedCase()
                             ->numbers()
                             ->symbols()
@@ -157,7 +162,7 @@ class UserController extends Controller
         $user->update([
             "name" => $request->name,
             "email" => $request->email,
-            "password" => Crypt::encrypt($request->password),
+            "password" => $request->password,
             'updated_at' => now()
         ]);
 
@@ -176,5 +181,43 @@ class UserController extends Controller
     }
 
 
+    public function sendEmailResetPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+    
+        return response()->json(['status' => $status], ($status == Password::RESET_LINK_SENT ? 200 : 400));
+    }
+
+    public function resetPassword(Request $request) {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'token' => 'required|string',
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                PasswordRules::min(8)
+                            ->mixedCase()
+                            ->numbers()
+                            ->symbols()
+                            ->uncompromised()
+            ]
+        ]);
+
+        $resetPasswordStatus = Password::reset($credentials, function ($user, $password) {
+            $user->password = $password;
+            $user->save();
+        });
+
+        if ($resetPasswordStatus == Password::INVALID_TOKEN) {
+            return response()->json(["msg" => "Invalid token provided"], 400);
+        }
+
+        return response()->json(["msg" => "Password has been successfully changed"]);
+    }
 
 }
