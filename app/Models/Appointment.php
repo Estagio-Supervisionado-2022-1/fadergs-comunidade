@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Appointment extends Model
 {
     protected $softDelete = true;
-    protected $fillable = ['status', 'datetime'];
+    protected $fillable = ['service_id', 'datetime', 'service_id', 'address_id', 'user_id'];
 
     public function addresses (){
         return $this->hasMany(Address::class, 'address_id');

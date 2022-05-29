@@ -143,7 +143,7 @@ class AdminAccountController extends Controller
                     return response()->json(['errors' => $validatorReturn->errors()]);
                 }
 
-                $administrator->updateOrCreate(['id' => $administrator->id], [
+                $administrator->update(['id' => $administrator->id], [
                     'name' => $request->name,
                 ]);
 

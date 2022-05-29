@@ -89,15 +89,21 @@ $api->version('v1', function ($api){
                     $api->post('account/admin', 'App\Http\Controllers\Admin\AdminAccountController@store');
                     $api->post('account/manager', 'App\Http\Controllers\Admin\ManagerAccountController@store');
                     $api->post('departament', 'App\Http\Controllers\DepartamentController@store');
-                });
+                    $api->post('admin/appointment', 'App\Http\Controllers\AdminAppointmentController@store');
+
+            });
 
                 // MANAGER / ADMIN
                 $api->group(['middleware' => ['role:admin|manager']], function ($api) {
                     $api->post('service', 'App\Http\Controllers\Admin\ServiceManagementController@store');
                     $api->post('account/student', 'App\Http\Controllers\Admin\StudentAccountController@store');
-                    $api->post('appointment', 'App\Http\Controllers\AppointmentManagementController@store');
                     $api->post('main/address', 'App\Http\Controllers\Admin\AddressManagementController@store');
                     $api->post('address', 'App\Http\Controllers\Admin\SecondaryAddressManagementController@store');
+                });
+
+                // MANAGER
+                $api->group(['middleware' => ['role:manager']], function ($api){
+                    $api->post('manager/appointment', 'App\Http\Controllers\ManagerAppointmentController@store');
                 });
 
 
@@ -113,6 +119,7 @@ $api->version('v1', function ($api){
                     $api->put('account/admin/{admin}', 'App\Http\Controllers\Admin\AdminAccountController@update');
                     $api->put('account/manager/{manager}', 'App\Http\Controllers\Admin\ManagerAccountController@update');
                     $api->put('departament/{departament}', 'App\Http\Controllers\DepartamentController@update');
+                    $api->put('admin/appointment/{appointment}', 'App\Http\Controllers\AdminAppointmentController@update');
                 });
 
                 // MANAGER / ADMIN
@@ -123,9 +130,13 @@ $api->version('v1', function ($api){
                     $api->put('address/{secondary}', 'App\Http\Controllers\Admin\SecondaryAddressManagementController@update');
                 });
 
+                $api->group(['middleware' => ['role:manager']], function ($api){
+                    $api->put('manager/appointment/{appointment}', 'App\Http\Controllers\ManagerAppointmentController@update');
+                });
+
                 //VISIVEL A TODOS
                 // DESDE QUE O USUÁRIO/OPERADOR ESTEJA ASSOCIADO OU O COORDENADOR SEJA RESPONSÁVEL PELO DEPARTAMENTO OU SEJA O ADMIN
-                $api->put('appointment/{appointment}', 'App\Http\Controllers\AppointmentManagementController@update');
+                
 
 
                 // RECUPERACAO DE SENHA

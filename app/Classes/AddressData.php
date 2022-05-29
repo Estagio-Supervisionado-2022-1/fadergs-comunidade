@@ -26,7 +26,7 @@ class AddressData {
     public function getSecondaryAddressesData ($pagination){
         $secondaryAdresses = SecondaryAddress::all()->isEmpty() ?
                                 ['address_error' => 'Não existem salas cadastrados'] :
-                                SecondaryAddress::paginate($pagination);
+                                SecondaryAddress::with('addresses')->paginate($pagination);
         return $secondaryAdresses;
 
     }
