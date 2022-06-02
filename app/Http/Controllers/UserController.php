@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rules\Password as PasswordRules;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UserController extends Controller
 {
@@ -21,14 +21,14 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (! $user = auth()->guard('api_users')->user()){
-            return response()->json(['message_error' => 'Usuário não está logado'], 401);
+        $users = User::all();
+
+        if (empty($users)) {
+            throw new NotFoundHttpException('Usuários não encontrados');
         }
 
-        $futureAppointmentsOfUser = Appointment::where('user_id', $user->id)
-                                            ->whereDate('datetime', '>=', Carbon::now()
-                                                                                    ->toDateString())
-                                            ->get();
+        return response()->json(['users'=>$users], 200);
+    }
 
     }
 
@@ -65,7 +65,7 @@ class UserController extends Controller
             'password'      => [
                 'required',
                 'string',
-                Password::min(8)
+                PasswordRules::min(8)
                             ->mixedCase()
                             ->numbers()
                             ->symbols()
@@ -83,10 +83,8 @@ class UserController extends Controller
             'name'              => $request->name,
             'email'             => $request->email,
             'password'          => $request->password,
-            'cpf'               => $request->cpf,
-            'telphone'          => $request->telphone,
             'created_at'        => now(),
-            'updated_at'        => now(),
+            'updated_at'        => now()
         ]);
 
         $user->assignRole('user');
@@ -125,6 +123,7 @@ class UserController extends Controller
     public function show($id)
     {
         $user = User::find($id);
+
         if (empty($user)) {
             return abort(404);
         }
@@ -167,7 +166,7 @@ class UserController extends Controller
             'password'      => [
                 'required',
                 'string',
-                Password::min(8)
+                PasswordRules::min(8)
                             ->mixedCase()
                             ->numbers()
                             ->symbols()
@@ -190,11 +189,11 @@ class UserController extends Controller
         $user->update([
             "name" => $request->name,
             "email" => $request->email,
-            "password" => Crypt::encrypt($request->password),
+            "password" => $request->password,
             'updated_at' => now()
         ]);
 
-        return response()->json(['user'=>$user], 200);
+        return response()->json($user, 200);
     }
 
     /**
@@ -209,5 +208,43 @@ class UserController extends Controller
     }
 
 
+    public function sendEmailResetPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+        
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+    
+        return response()->json(['status' => $status], ($status == Password::RESET_LINK_SENT ? 200 : 400));
+    }
+
+    public function resetPassword(Request $request) {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'token' => 'required|string',
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                PasswordRules::min(8)
+                            ->mixedCase()
+                            ->numbers()
+                            ->symbols()
+                            ->uncompromised()
+            ]
+        ]);
+
+        $resetPasswordStatus = Password::reset($credentials, function ($user, $password) {
+            $user->password = $password;
+            $user->save();
+        });
+
+        if ($resetPasswordStatus == Password::INVALID_TOKEN) {
+            return response()->json(["msg" => "Invalid token provided"], 400);
+        }
+
+        return response()->json(["msg" => "Password has been successfully changed"]);
+    }
 
 }

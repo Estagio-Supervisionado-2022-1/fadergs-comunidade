@@ -22,16 +22,15 @@ class HistoryActionDepartament extends Model
 
     protected $fillable = ['departament_id', 'user_id', 'action', 'data'];
 
-    public function setActionAttribute ($value)
-    {
+    public function setActionAttribute($value) 
+    {   
         if (!in_array($value, self::ACTIONS)) {
-            new Exception ('value action error');
+            new Exception('value action error');
         }
-
-        $this->attributes['action'] = $value;
+        $this->attributes['action'] = $value; 
     }
 
-    public function scopeFindNames ($query, $name)
+    public function scopeFindNames($query, $name)
     {
         return $query->whereJsonContains('data', ['name' => $name]);
     }

@@ -6,10 +6,12 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Notifications\PasswordReset;
+use Illuminate\Notifications\Notifiable;
 
 class Operator extends Authenticatable implements JWTSubject
 {
-    use HasRoles, SoftDeletes;
+    use HasRoles, SoftDeletes, Notifiable;
 
     protected $softDelete = true;
     protected $guard_name = 'api';
@@ -53,5 +55,10 @@ class Operator extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new PasswordReset($token));
     }
 }

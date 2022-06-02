@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAccountController;
+use App\Http\Controllers\DepartamentController;
 use App\Http\Controllers\Admin\ManagerAccountController;
 use App\Http\Controllers\Admin\StudentAccountController;
 use App\Http\Controllers\Admin\ServiceManagementController;

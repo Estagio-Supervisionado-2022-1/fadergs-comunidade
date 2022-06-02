@@ -12,15 +12,11 @@ class Departament extends Model
 
     protected $softDelete = true;
 
-    protected $hidden = [
-        'created_at', 'updated_at', 'deleted_at'
-    ];
-
     protected $fillable = ['name'];
 
-    public static $attrMakeHiden = ['id', 'updated_at', 'created_at', 'deleted_at'];
+    public static $attrMakeHidden = ['id', 'updated_at', 'created_at', 'deleted_at'];
 
-    public function history(){
+    public function history() {
         return $this->hasMany(HistoryActionDepartament::class, 'departament_id');
     }
 
@@ -28,35 +24,41 @@ class Departament extends Model
     {
         parent::boot();
 
-        self::created(function ($model){
+        self::created(function ($model) {
+            HistoryActionDepartament::create([
+                'departament_id' => $model->id,
+                'user_id' => 0,
+                'action' => HistoryActionDepartament::ACTION_INSETED,
+                'data' => $model->makeHidden(Departament::$attrMakeHidden)->toJson()
+           ]);
+           $model->makeVisible(Departament::$attrMakeHidden);
+        });
+
+        self::updated(function ($model) {
             HistoryActionDepartament::create([
                 'departament_id' => $model->id,
                 'user_id' => 0,
                 'action' => HistoryActionDepartament::ACTION_UPDATED,
-                'data' => $model->makeHidden(Departament::$attrMakeHiden)->toJson()
-            ]);
-            $model->makeVisible(Departament::$attrMakeHiden);
+                'data' => $model->makeHidden(Departament::$attrMakeHidden)->toJson()
+           ]);
+           $model->makeVisible(Departament::$attrMakeHidden);
         });
 
-        self::deleted(function ($model){
+        self::deleted(function ($model) {
             HistoryActionDepartament::create([
                 'departament_id' => $model->id,
                 'user_id' => 0,
                 'action' => HistoryActionDepartament::ACTION_DELETED,
-                'data' => $model->makeHidden(Departament::$attrMakeHiden)->toJson()
-            ]);
-            $model->makeVisible(Departament::$attrMakeHiden);
+                'data' => $model->makeHidden(Departament::$attrMakeHidden)->toJson()
+           ]);
         });
-
     }
-
-    public function Operator (){
-        return $this->hasMany(Operator::class, 'departament_id');
-    }
-
     public function Services () {
         return $this->hasMany(Services::class, 'departament_id');
     }
 
     
+    public function Operator (){
+        return $this->belongsTo(Operator::class, 'departament_id');
+    }
 }
