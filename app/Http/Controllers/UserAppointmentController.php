@@ -2,18 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\AppointmentData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Spatie\Permission\Traits\HasRoles;
 
 class UserAppointmentController extends Controller
 {
+    use HasRoles;
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        // PEGAR OS AGENDAMENTOS DO USUÁRIO
+
+        
+        $appointmentData = new AppointmentData();
+
+        $validatorReturn = Validator::make(
+            $request->all(), 
+            $appointmentData->getIndexRulesToValidate()
+        );
+
+        if ($validatorReturn->fails()){
+            return response()->json([
+                'validation errors' => $validatorReturn->errors()
+            ], 400);
+        }
+
+        $user = auth()->user();
+
+        if ( $request->pagination) {
+            $appointments = $appointmentData->getAppointmentsDataByUser($request->pagination, $user);
+        }
+        else {
+            $appointments = $appointmentData->getAppointmentsDataByUser(10, $user);
+        }
+
+        return response()->json([
+            'appointments' => $appointments
+        ]);
+        
     }
 
     /**

@@ -69,6 +69,9 @@ $api->version('v1', function ($api){
 
                     $api->get('main/addresses', 'App\Http\Controllers\Admin\AddressManagementController@index');
                     $api->get('main/addresses/{address}', 'App\Http\Controllers\Admin\AddressManagementController@show');
+                    
+                    $api->get('admin/appointments', 'App\Http\Controllers\AdminAppointmentController@index');
+                    $api->get('admin/appointments/{appointment}', 'App\Http\Controllers\AdminAppointmentController@show');
 
                     
                 });
@@ -77,6 +80,23 @@ $api->version('v1', function ($api){
                 $api->group(['middleware' => ['role:admin|manager']], function ($api) {
                     $api->get('accounts/students', 'App\Http\Controllers\Admin\StudentAccountController@index');
                     $api->get('accounts/students/{student}', 'App\Http\Controllers\Admin\StudentAccountController@show');
+                });
+
+                // MANAGER
+                $api->group(['middleware' => ['role:manager']], function ($api) {
+                    $api->get('manager/appointments', 'App\Http\Controllers\ManagerAppointmentController@index');
+                    $api->get('manager/appointments/{appointments}', 'App\Http\Controllers\ManagerAppointmentController@show');
+            });
+                
+                // STUDENT
+                $api->group(['middleware' => ['role:student']], function ($api) {
+                    $api->get('student/appointments', 'App\Http\Controllers\StudentAppointmentController@index');
+                    $api->get('student/appointments/{appointments}', 'App\Http\Controllers\StudentAppointmentController@show');
+            });
+
+
+                $api->group(['middleware' => ['role:user']], function ($api) {
+                    $api->get('user/appointments', 'App\Http\Controllers\UserAppointmentController@index'); 
                 });
             });
 
@@ -163,7 +183,8 @@ $api->version('v1', function ($api){
                 $api->group(['middleware' => ['role:admin']], function ($api) {
                     $api->delete('account/admin/{admin}', 'App\Http\Controllers\Admin\AdminAccountController@destroy');
                     $api->delete('account/manager/{manager}', 'App\Http\Controllers\Admin\ManagerAccountController@destroy');
-                    $api->delete('departament/{departament}', 'App\Http\Controllers\DepartamentController@update');
+                    $api->delete('departament/{departament}', 'App\Http\Controllers\DepartamentController@destroy');
+                    
                 });
                 // ADMIN / MANAGER
                 $api->group(['middleware' => ['role:admin|manager']], function ($api) {
@@ -171,7 +192,7 @@ $api->version('v1', function ($api){
                     $api->delete('main/address/{address}', 'App\Http\Controllers\Admin\AddressManagementController@destroy');
                     $api->delete('address/{address}', 'App\Http\Controllers\Admin\SecondaryAddressManagementController@destroy');
                     $api->delete('account/student/{student}', 'App\Http\Controllers\Admin\StudentAccountController@destroy');
-                    $api->delete('appointment/{appointment}', 'App\Http\Controllers\AppointmentManagementController@destroy');
+                    $api->delete('appointment/{appointment}', 'App\Http\Controllers\AdminAppointmentController@destroy');
                 }); 
 
 

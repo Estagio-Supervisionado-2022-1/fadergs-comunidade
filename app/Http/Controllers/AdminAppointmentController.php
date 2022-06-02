@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
+
 
 class AdminAppointmentController extends Controller
 {
@@ -22,9 +26,33 @@ class AdminAppointmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+
+        $appointmentData = new AppointmentData();
+
+        $validatorReturn = Validator::make(
+            $request->all(), 
+            $appointmentData->getIndexRulesToValidate(), 
+        );
+
+        if ($validatorReturn->fails()){
+            return response()->json([
+                'validation errors' => $validatorReturn->errors()
+            ]);
+        }
+
+        if ( $request->pagination) {
+            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndDepartament($request->pagination);
+        }
+        else {
+            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndDepartament(10);
+        }
+
+        return response()->json([
+            'appointments' => $appointments
+        ]);
+        
     }
 
     /**
@@ -87,7 +115,11 @@ class AdminAppointmentController extends Controller
      */
     public function show($id)
     {
-        //
+        $appointmentData = new AppointmentData();
+
+        $appointment = $appointmentData->getAppointmentLikeAdmin($id);
+            
+        return response()->json($appointment)->setStatusCode(200);
     }
 
     /**
@@ -232,6 +264,15 @@ class AdminAppointmentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        if (! $appointment = Appointment::find($id)) {
+            throw new NotFoundHttpException('Agendamento não encontrado com o id = ' . $id);
+        }
+        try {
+                $appointment->delete();
+                return response()->json(['message' => 'Agendamento desativado com sucesso']);
+                        
+        } catch (HttpException $e) {
+            throw $e;
+        }
     }
 }

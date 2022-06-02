@@ -9,45 +9,84 @@ use Doctrine\Common\Annotations\Annotation\Enum;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 
-class AppointmentData {
+class AppointmentData
+{
 
-    public function getAppointmentsDataByUser($pagination, $user){
+    public function getAppointmentsDataByUser($pagination, $user)
+    {
         $appointments = Appointment::where('user_id', $user->id)
-                                    ->orderBy('datetime', 'desc')
-                                    ->paginate($pagination);
+            ->groupBy('status')
+            ->orderBy('datetime', 'desc')
+            ->paginate($pagination);
         return $appointments;
     }
 
-    public function getAppointmentsData($pagination) {
-        $appointments = Appointment::orderBy('datetime', 'desc')
-                                        ->paginate($pagination);
-        die ($appointments);
+    public function getAppointmentsData($pagination)
+    {
+        $appointments = Appointment::where('status', '<>', 'Atendido')
+            ->orWhere('status', '<>', 'Cancelado')
+            ->orderBy('datetime', 'desc')
+            ->paginate($pagination);
+        die($appointments);
     }
 
-    public function getAppointmentLikeAdmin ($id){
+    public function getAppointmentDataGroupedByStatusAndDepartament($pagination)
+    {
+        $appointments = Appointment::paginate($pagination)->groupBy('status', 'service_id');
+
+        return $appointments;
+    }
+
+    public function getAppointmentDataGroupedByStatusAndService($pagination)
+    {
+        $appointments = Appointment::get();
+        $userDepartament = auth()->user()->departament_id;
+        $data = collect();
+        
+
+        foreach ($appointments as $appointment){
+            if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
+                $data->push($appointment);
+                
+            }
+        }
+
+        if ($data->count() > 0) {
+            return $data->groupBy('status', 'service_id');
+        }
+           
+
+        return response()->json(['error' => 'Não foi possível encontrar nenhum agendamento'], 400);
+    }
+
+    public function getAppointmentLikeAdmin($id)
+    {
         $appointment = Appointment::find($id);
+
+        if ($appointment == null) {
+            return response()->json(['error' => 'Não foi possível encontrar o agendamento'], 400);
+        }
 
         return $appointment;
     }
 
-    public function getAppointmentLikeManager ($id){
+    public function getAppointmentData($id) {
+
         $appointment = Appointment::find($id);
-        $service = Service::where('departament_id', auth()->user()->departament_id)->first() ;
+        $userDepartament = auth()->user()->departament_id;
 
-        if (isset($service->id)){
-            if ($appointment->service_id == $service->id )
+            if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
+
                 return $appointment;
-        }
-
-        else {
-            return response()->json(['error' => 'Não foi possível encontrar este agendamento'], 400);
-        }
-
-
+            }
+        return response()->json(['error' => 'Não foi possível encontrar nenhum agendamento'], 400);
     }
 
 
-    public function getIndexRulesToValidate (){
+
+
+    public function getIndexRulesToValidate()
+    {
         return [
             'pagination' => [
                 'integer',
@@ -59,10 +98,11 @@ class AppointmentData {
 
 
 
-    public function getStoreRulesToValidate () {
+    public function getStoreRulesToValidate()
+    {
         return [
             'status' => [
-                Rule::in(['Aguardando Confirmação','Confirmado','Cancelado','Atendido'])
+                Rule::in(['Aguardando Confirmação', 'Confirmado', 'Cancelado', 'Atendido'])
             ],
             'datetime' => [
                 'required',
@@ -83,10 +123,11 @@ class AppointmentData {
         ];
     }
 
-    public function getStoreManagerRulesToValidate () {
+    public function getStoreManagerRulesToValidate()
+    {
         return [
             'status' => [
-                Rule::in(['Aguardando Confirmação','Confirmado','Cancelado','Atendido'])
+                Rule::in(['Aguardando Confirmação', 'Confirmado', 'Cancelado', 'Atendido'])
             ],
             'datetime' => [
                 'required',

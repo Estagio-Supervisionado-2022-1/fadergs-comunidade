@@ -22,9 +22,31 @@ class ManagerAppointmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $appointmentData = new AppointmentData();
+
+        $validatorReturn = Validator::make(
+            $request->all(), 
+            $appointmentData->getIndexRulesToValidate(), 
+        );
+
+        if ($validatorReturn->fails()){
+            return response()->json([
+                'validation errors' => $validatorReturn->errors()
+            ]);
+        }
+
+        if ( $request->pagination) {
+            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndService($request->pagination);
+        }
+        else {
+            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndService(10);
+        }
+
+        return response()->json([
+            'appointments' => $appointments
+        ]);
     }
 
     /**
@@ -85,7 +107,11 @@ class ManagerAppointmentController extends Controller
      */
     public function show($id)
     {
-        //
+        $appointmentData = new AppointmentData();
+
+        $appointment = $appointmentData->getAppointmentData($id);
+
+        return $appointment;
     }
 
     /**
@@ -99,7 +125,7 @@ class ManagerAppointmentController extends Controller
     {
         $appointmentData = new AppointmentData();
 
-        $appointment = $appointmentData->getAppointmentLikeManager($id);
+        $appointment = $appointmentData->getAppointmentData($id);
         
         if (!empty($request->status)) {
             $validatorReturn = Validator::make($request->all(), [
