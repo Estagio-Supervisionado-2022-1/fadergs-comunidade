@@ -17,18 +17,20 @@ class CreateAppointmentsTable extends Migration
             $table->id();
             $table->enum('status', ['Aguardando Confirmação', 'Confirmado', 'Cancelado', 'Atendido']);
             $table->dateTime('datetime');
-            $table->bigInteger('address_id')->unsigned();
-            $table->bigInteger('user_id')->unsigned();
-            $table->bigInteger('operator_id')->unsigned();
+            $table->boolean('compareceu')->default(false);
+            $table->bigInteger('room_id')->unsigned()->nullable();
+            $table->bigInteger('user_id')->unsigned()->nullable();
+            $table->bigInteger('operator_id')->unsigned()->nullable();
             $table->bigInteger('service_id')->unsigned();
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('address_id')->references('id')->on('addresses');
+            $table->foreign('room_id')->references('id')->on('secondary_addresses');
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('operator_id')->references('id')->on('operators');
             $table->foreign('service_id')->references('id')->on('services');
         });
+
     }
 
     /**

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Appointment extends Model
 {
     protected $softDelete = true;
-    protected $fillable = ['status', 'datetime'];
+    protected $fillable = ['service_id', 'datetime', 'service_id', 'address_id', 'user_id'];
 
     public function addresses (){
         return $this->hasMany(Address::class, 'address_id');
@@ -19,7 +19,7 @@ class Appointment extends Model
     }
 
     public function operators () {
-        return $this->belongsToMany(Operator::class,'appointment_operator', 'appointment_id', 'user_id' );
+        return $this->belongsTo(Operator::class);
     }
 
     public function users (){

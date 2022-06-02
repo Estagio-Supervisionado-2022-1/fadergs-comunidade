@@ -34,5 +34,7 @@ class OperatorSeeder extends Seeder
         }
 
         Operator::find(1)->assignRole('admin');
+        Operator::find(2)->assignRole('manager');   
+        Operator::find(3)->assignRole('student');
 }
 }

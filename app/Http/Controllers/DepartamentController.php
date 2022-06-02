@@ -72,7 +72,7 @@ class DepartamentController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|min:3|max:255',
+            'name' => 'required|string|min:3|max:255'
         ]);
 
         $departament = $this->modelDepartament->create($data);
@@ -120,7 +120,7 @@ class DepartamentController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->validate([
-            'name' => 'required|string|min:3|max:255',
+            'name' => 'required|string|min:3|max:255'
         ]);
         
         $departament = $this->modelDepartament->find($id);

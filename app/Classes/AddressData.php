@@ -10,7 +10,7 @@ class AddressData {
 
     public function getAddressData ($pagination){
         $addresses = Address::all()->isEmpty() ?
-                            ['address_error' => 'Não existem salas cadastradas'] :
+                            ['address_error' => 'Não existem endereços cadastrados'] :
                             Address::paginate($pagination);
 
         return $addresses;  
@@ -18,7 +18,7 @@ class AddressData {
 
     public function getCountAddresses (){
         $addresses = Address::count() == 0 ?
-                                ['address_error' => 'Não existem salas cadastradas'] :
+                                ['address_error' => 'Não existem endereços cadastrados'] :
                                 ['address_count' => Address::count()];
         return $addresses;
     }
@@ -26,7 +26,7 @@ class AddressData {
     public function getSecondaryAddressesData ($pagination){
         $secondaryAdresses = SecondaryAddress::all()->isEmpty() ?
                                 ['address_error' => 'Não existem salas cadastrados'] :
-                                SecondaryAddress::paginate($pagination);
+                                SecondaryAddress::with('addresses')->paginate($pagination);
         return $secondaryAdresses;
 
     }

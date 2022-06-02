@@ -56,7 +56,7 @@ class RolesAndPermissionsSeeder extends Seeder
             ]);
         }
 
-        Role::create(['name' => 'admin'
+        Role::create(['name' => 'admin', 'guard_name' => 'api'
         ])->givePermissionTo(Permission::all());
 
         Role::create ([
@@ -65,6 +65,11 @@ class RolesAndPermissionsSeeder extends Seeder
 
         Role::create([
             'name' => 'student'
+        ]);
+
+        Role::create([
+            'name' => 'user',
+            'guard_name' => 'api_users'
         ]);
 
 

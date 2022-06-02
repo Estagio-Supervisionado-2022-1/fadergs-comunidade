@@ -14,6 +14,7 @@ class Operator extends Authenticatable implements JWTSubject
     use HasRoles, SoftDeletes, Notifiable;
 
     protected $softDelete = true;
+    protected $guard_name = 'api';
     
     protected $fillable = [
         'name',
@@ -29,6 +30,10 @@ class Operator extends Authenticatable implements JWTSubject
 
     public function Departament () {
         return $this->belongsTo(Departament::class, 'id');
+    }
+
+    public function appointment() {
+        return $this->hasMany(Appointment::class);
     }
 
     public function setPasswordAttribute($password){

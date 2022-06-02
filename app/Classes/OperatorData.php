@@ -132,6 +132,15 @@ class OperatorData {
         ];
     }
 
+    public function getPasswordResetRulesToValidade(){
+        return [
+            'passwordReset' => [
+                'required',
+                'accepted'
+            ]
+        ];
+    }
+
 
     public function getErrorMessagesToValidate(){
         return [
