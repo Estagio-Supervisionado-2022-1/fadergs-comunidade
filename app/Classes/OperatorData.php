@@ -16,7 +16,7 @@ class OperatorData {
     public function getDataAdminOperator($pagination){
         $administrators = Operator::role('admin') == null ? 
                                     ['admin_error' => 'Não existem administradores cadastrados'] : 
-                                    Operator::role('admin')->paginate($pagination);
+                                    Operator::role('admin')->get();
         return $administrators;
                
     }
@@ -24,7 +24,7 @@ class OperatorData {
     public function getDataManagerOperator($pagination){
         $managers = Operator::role('manager') == null ? 
                                 ['manager_error' => 'Não existem coordenadores cadastrados'] :
-                                Operator::role('manager')->paginate($pagination);
+                                Operator::role('manager')->orderBy('name', 'ASC')->get()->groupBy('departament_id');
         return $managers;
         
         
@@ -33,7 +33,16 @@ class OperatorData {
     public function getDataStudentOperator($pagination){
         $students = Operator::role('student') == null ?
                                 ['students_error' => 'Não existem alunos cadastrados'] :
-                                Operator::role('student')->paginate($pagination);
+                                Operator::role('student')->orderBy('name', 'ASC')->get()->groupBy('departament_id');
+
+        return $students;  
+        
+    }
+
+    public function getDataStudentOperatorLikeManager($pagination){
+        $students = Operator::role('student') == null ?
+                                ['students_error' => 'Não existem alunos cadastrados'] :
+                                Operator::role('student')->where('departament_id', auth()->user()->departament_id)->orderBy('name', 'ASC')->get()->groupBy('departament_id');
 
         return $students;  
         

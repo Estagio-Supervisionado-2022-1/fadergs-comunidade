@@ -14,10 +14,13 @@ class AppointmentData
 
     public function getAppointmentsDataByUser($pagination, $user)
     {
+        if (!auth('api_users')->check()){
+            abort(400, 'Operador nao eh do tipo usuario');
+        }
         $appointments = Appointment::where('user_id', $user->id)
-            ->groupBy('status')
             ->orderBy('datetime', 'desc')
-            ->paginate($pagination);
+            ->get()
+            ->groupBy('status');
         return $appointments;
     }
 
@@ -26,13 +29,14 @@ class AppointmentData
         $appointments = Appointment::where('status', '<>', 'Atendido')
             ->orWhere('status', '<>', 'Cancelado')
             ->orderBy('datetime', 'desc')
-            ->paginate($pagination);
-        die($appointments);
+            ->get();
+
+            return $appointments;
     }
 
     public function getAppointmentDataGroupedByStatusAndDepartament($pagination)
     {
-        $appointments = Appointment::paginate($pagination)->groupBy('status', 'service_id');
+        $appointments = Appointment::get()->groupBy('status', 'service_id');
 
         return $appointments;
     }

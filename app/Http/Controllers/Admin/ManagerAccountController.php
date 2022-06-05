@@ -19,13 +19,16 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ManagerAccountController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request){
-
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $operatorData = new OperatorData();
 
         $validatorReturn = Validator::make(
@@ -34,10 +37,12 @@ class ManagerAccountController extends Controller
             $operatorData->getErrorMessagesToValidate()
         );
 
+
+
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
-            ]);
+            ], 400);
         }
 
         if ( $request->pagination) {
@@ -58,7 +63,9 @@ class ManagerAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request){
-
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $operatorData = new operatorData();
 
         $validatorReturn = Validator::make(
@@ -70,14 +77,14 @@ class ManagerAccountController extends Controller
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
-            ]);
+            ], 400);
         }
 
         try {
             $faker = Faker::create();
             $password = $faker->password(8,12);
 
-            $manager = Operator::withTrashed()->firstOrCreate([
+            $manager = Operator::withTrashed()->create([
                 'name'              => $request->name,
                 'email'             => $request->email,
                 'password'          => $password,
@@ -110,7 +117,9 @@ class ManagerAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id){
-
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $operatorData = new OperatorData();
 
         $manager = $operatorData->getDataManagerById($id);
@@ -126,7 +135,9 @@ class ManagerAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
-
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $operatorData = new OperatorData();
 
         $manager = $operatorData->getDataManagerById($id);
@@ -143,7 +154,7 @@ class ManagerAccountController extends Controller
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $manager->updateOrCreate(['id' => $manager->id], [
@@ -164,7 +175,7 @@ class ManagerAccountController extends Controller
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $manager->updateOrCreate(['id' => $manager->id], [
@@ -184,7 +195,7 @@ class ManagerAccountController extends Controller
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $manager->updateOrCreate(['id' => $manager->id], [
@@ -197,7 +208,7 @@ class ManagerAccountController extends Controller
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $faker = Faker::create();
@@ -234,6 +245,9 @@ class ManagerAccountController extends Controller
      */
     public function destroy($id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         if (! $manager = Operator::find($id)) {
             throw new NotFoundHttpException('Operador não encontrado com o id = ' . $id);
         }

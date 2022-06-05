@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Classes\AppointmentData;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -21,7 +22,9 @@ class UserAppointmentController extends Controller
     {
         // PEGAR OS AGENDAMENTOS DO USUÁRIO
 
-        
+        $user = auth('api')->user();
+        $user->userRole = User::find($user->id)->getRoleNames()[0];
+
         $appointmentData = new AppointmentData();
 
         $validatorReturn = Validator::make(

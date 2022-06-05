@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AdminAppointmentController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -28,7 +29,9 @@ class AdminAppointmentController extends Controller
      */
     public function index(Request $request)
     {
-
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
 
         $validatorReturn = Validator::make(
@@ -63,7 +66,9 @@ class AdminAppointmentController extends Controller
      */
     public function store(Request $request)
     {
-
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
         $data = [];
 
@@ -115,6 +120,9 @@ class AdminAppointmentController extends Controller
      */
     public function show($id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
 
         $appointment = $appointmentData->getAppointmentLikeAdmin($id);
@@ -131,6 +139,9 @@ class AdminAppointmentController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
 
         $appointment = $appointmentData->getAppointmentLikeAdmin($id);
@@ -264,6 +275,9 @@ class AdminAppointmentController extends Controller
      */
     public function destroy($id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         if (! $appointment = Appointment::find($id)) {
             throw new NotFoundHttpException('Agendamento não encontrado com o id = ' . $id);
         }

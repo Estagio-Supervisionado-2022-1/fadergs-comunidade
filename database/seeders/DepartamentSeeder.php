@@ -21,6 +21,7 @@ class DepartamentSeeder extends Seeder
         foreach ($departaments as $departament) {
             Departament::insert([
                 'name'          => $departament,
+                'description' => 'Nome do Departament ' . $departament,
                 'created_at'    => now(),
                 'updated_at'    => now(),
             ]);

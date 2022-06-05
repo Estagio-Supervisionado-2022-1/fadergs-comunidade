@@ -17,6 +17,7 @@ use App\Models\User;
 
 class StudentAppointmentController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -24,6 +25,9 @@ class StudentAppointmentController extends Controller
      */
     public function index(Request $request)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
 
         $validatorReturn = Validator::make(
@@ -68,7 +72,9 @@ class StudentAppointmentController extends Controller
      */
     public function show($id)
     {
-
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
     
         $appointment = $appointmentData->getAppointmentData($id);
@@ -85,6 +91,9 @@ class StudentAppointmentController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
 
         $appointment = $appointmentData->getAppointmentData($id);

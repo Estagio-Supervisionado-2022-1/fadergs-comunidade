@@ -18,12 +18,17 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AdminAccountController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
+
         $operatorData = new operatorData();
 
         $validatorReturn = Validator::make(
@@ -35,7 +40,7 @@ class AdminAccountController extends Controller
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
-            ]);
+            ], 400);
         }
 
         if ( $request->pagination) {
@@ -56,6 +61,10 @@ class AdminAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
+
         $operatorData = new operatorData();
 
         $validatorReturn = Validator::make(
@@ -67,7 +76,7 @@ class AdminAccountController extends Controller
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
-            ]);
+            ], 400);
         }
 
         try {
@@ -107,6 +116,9 @@ class AdminAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
 
         $operatorData = new OperatorData();
 
@@ -123,6 +135,9 @@ class AdminAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
 
         $operatorData = new OperatorData();
 
@@ -140,7 +155,7 @@ class AdminAccountController extends Controller
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $administrator->update(['id' => $administrator->id], [
@@ -155,13 +170,12 @@ class AdminAccountController extends Controller
                         'required',
                         'email',
                         'max:255',
-                        'unique:operators,email'
                     ],
                 ]);
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $administrator->updateOrCreate(['id' => $administrator->id], [
@@ -181,7 +195,7 @@ class AdminAccountController extends Controller
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $administrator->updateOrCreate(['id' => $administrator->id], [
@@ -199,7 +213,7 @@ class AdminAccountController extends Controller
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $faker = Faker::create();
@@ -235,6 +249,9 @@ class AdminAccountController extends Controller
      */
     public function destroy($id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         if (! $administrator = Operator::find($id)) {
             throw new NotFoundHttpException('Operador não encontrado com o id = ' . $id);
         }

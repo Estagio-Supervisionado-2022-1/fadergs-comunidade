@@ -17,6 +17,7 @@ use Illuminate\Validation\Rule;
 
 class ManagerAppointmentController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -24,6 +25,9 @@ class ManagerAppointmentController extends Controller
      */
     public function index(Request $request)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
 
         $validatorReturn = Validator::make(
@@ -57,6 +61,9 @@ class ManagerAppointmentController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
         $data = [];
 
@@ -107,6 +114,9 @@ class ManagerAppointmentController extends Controller
      */
     public function show($id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
 
         $appointment = $appointmentData->getAppointmentData($id);
@@ -123,6 +133,9 @@ class ManagerAppointmentController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $appointmentData = new AppointmentData();
 
         $appointment = $appointmentData->getAppointmentData($id);
