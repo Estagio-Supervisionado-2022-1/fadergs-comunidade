@@ -9,7 +9,7 @@ class DepartamentData {
     public function getDepartamentData ($pagination){
         $departaments = Departament::all() == null ?
                             ['departament_error' => 'Não existem departamentos cadastrados'] :
-                            Departament::all()->paginate($pagination);
+                            Departament::all();
 
         return $departaments;  
     }

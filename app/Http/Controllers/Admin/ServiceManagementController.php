@@ -32,7 +32,7 @@ class ServiceManagementController extends Controller
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
-            ]);
+            ], 400);
         }
 
         if ( $request->pagination) {
@@ -41,31 +41,6 @@ class ServiceManagementController extends Controller
         else {
             $services = $serviceData->getServiceData(10);
         }
-
-        $data = [
-            [
-                'name' => 'teste1',
-                'departament_id' => 1
-            ],
-            [
-                'name' => 'teste1',
-                'departament_id' => 1
-            ],
-            [
-                'name' => 'teste1',
-                'departament_id' => 1
-            ],
-            [
-                'name' => 'teste1',
-                'departament_id' => 1
-            ],
-            [
-                'name' => 'teste1',
-                'departament_id' => 1
-            ],
-        ];
-
-        Service::insert($data);
 
         
         return response()->json([
@@ -79,6 +54,9 @@ class ServiceManagementController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $serviceData = new ServiceData();
 
         $validatorReturn = Validator::make(
@@ -90,7 +68,7 @@ class ServiceManagementController extends Controller
 
         if ($validatorReturn->fails()){
             return response()->json([
-                'validation errors' => $validatorReturn->errors()
+                'validation errors' => $validatorReturn->errors(), 400
             ]);
         }
 
@@ -138,7 +116,9 @@ class ServiceManagementController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
-
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $serviceData = new ServiceData();
 
         if (! $service = Service::where('id', $id)->with('departaments')->first()) {
@@ -197,7 +177,7 @@ class ServiceManagementController extends Controller
             return response()->json($response)->setStatusCode(200);
         }
 
-        return response()->json(['message_fail' => 'Não foi possível criar o serviço, entre em contato com o administrador']);
+        return response()->json(['message_fail' => 'Não foi possível criar o serviço, entre em contato com o administrador'], 400);
 
     }
 
@@ -209,6 +189,9 @@ class ServiceManagementController extends Controller
      */
     public function destroy($id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         if (! $service = Service::find($id)) {
             throw new NotFoundHttpException('Serviço não encontrado com o id = ' . $id);
         }

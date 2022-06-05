@@ -10,7 +10,7 @@ class ServiceData {
     public function getServiceData ($pagination){
         $services = Service::all()->isEmpty() ?
                             ['service_error' => 'Não existem serviços cadastrados'] :
-                            Service::with('departaments')->paginate($pagination);
+                            Service::with('departaments')->get();
 
         return $services;  
     }

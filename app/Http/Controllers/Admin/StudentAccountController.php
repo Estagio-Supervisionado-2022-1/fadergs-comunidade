@@ -19,12 +19,16 @@ use App\Classes\OperatorData;
 
 class StudentAccountController extends Controller
 {
+
    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $operatorData = new OperatorData();
 
         $validatorReturn = Validator::make(
@@ -32,19 +36,32 @@ class StudentAccountController extends Controller
             $operatorData->getIndexRulesToValidate(), 
             $operatorData->getErrorMessagesToValidate()
         );
+        
 
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
-            ]);
+            ], 400);
         }
+        $operator = auth('api')->user();
+        $operator->userRole = Operator::find($operator->id)->getRoleNames()[0];
 
-        if ( $request->pagination) {
-            $students = $operatorData->getDataStudentOperator($request->pagination);
+        if ($operator->userRole == 'admin'){
+            if ( $request->pagination) {
+                $students = $operatorData->getDataStudentOperator($request->pagination);
+            }
+            else {
+                $students = $operatorData->getDataStudentOperator(10);
+            }
         }
-        else {
-            $students = $operatorData->getDataStudentOperator(10);
-        }
+        else if ($operator->userRole == 'manager') {
+            if ( $request->pagination) {
+                $students = $operatorData->getDataStudentOperatorLikeManager($request->pagination);
+            }
+            else {
+                $students = $operatorData->getDataStudentOperatorLikeManager(10);
+            }
+        }        
 
         return response()->json([
             'students' => $students
@@ -57,6 +74,9 @@ class StudentAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $operatorData = new OperatorData();
 
         $validatorReturn = Validator::make(
@@ -68,14 +88,14 @@ class StudentAccountController extends Controller
         if ($validatorReturn->fails()){
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
-            ]);
+            ], 400);
         }
 
         try {
             $faker = Faker::create();
             $password = $faker->password(8,12);
 
-            $student = Operator::withTrashed()->firstOrCreate([
+            $student = Operator::withTrashed()->create([
                 'name'              => $request->name,
                 'email'             => $request->email,
                 'password'          => $password,
@@ -108,11 +128,21 @@ class StudentAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id){
-
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $operatorData = new OperatorData();
 
-        $student = $operatorData->getDataStudentById($id);
+        $operator = auth()->guard('api')->user();
+        $operator->userRole = Operator::find($operator->id)->getRoleNames()[0];
 
+        if ($operator->userRole == 'student'){
+            $student = $operatorData->getDataStudentById($operator->id);    
+        }
+        else {
+            $student = $operatorData->getDataStudentById($id);    
+        }
+        
         return response()->json($student)->setStatusCode(200);
     }
 
@@ -124,7 +154,9 @@ class StudentAccountController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
-
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $operatorData = new OperatorData();
 
         $student = $operatorData->getDataStudentById($id);
@@ -141,7 +173,7 @@ class StudentAccountController extends Controller
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $student->updateOrCreate(['id' => $student->id], [
@@ -156,13 +188,12 @@ class StudentAccountController extends Controller
                         'required',
                         'email',
                         'max:255',
-                        'unique:operators,email'
                     ],
                 ], $operatorData->getErrorMessagesToValidate());
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $student->updateOrCreate(['id' => $student->id], [
@@ -182,7 +213,7 @@ class StudentAccountController extends Controller
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $student->updateOrCreate(['id' => $student->id], [
@@ -200,7 +231,7 @@ class StudentAccountController extends Controller
             
 
                 if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
+                    return response()->json(['errors' => $validatorReturn->errors()], 400);
                 }
 
                 $faker = Faker::create();
@@ -236,6 +267,9 @@ class StudentAccountController extends Controller
      */
     public function destroy($id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         if (! $student = Operator::find($id)) {
             throw new NotFoundHttpException('Operador não encontrado com o id = ' . $id);
         }

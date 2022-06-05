@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Mail;
 
 class AdminOperatorController extends Controller
 {
+
     use HasRoles;
     /**
      * Display a listing of the resource.
@@ -30,6 +31,9 @@ class AdminOperatorController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         
         if(! Operator::all() && Address::all() && Service::all() && Departament::all()){
             throw new NotFoundHttpException('Não existem dados nos registros, por favor, contate o adminsitrador');
@@ -63,6 +67,9 @@ class AdminOperatorController extends Controller
     }
 
     public function restoreOperator (Request $request) {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         if ( $operator = Operator::onlyTrashed()
             ->where('email', $request->email)
             ->with('roles', 'Departament', 'permissions')
@@ -95,6 +102,9 @@ class AdminOperatorController extends Controller
     }
 
     public function restoreService (Request $request){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         if (! $service = Service::onlyTrashed()
             ->where('name', $request->name)
             ->first()){
@@ -113,6 +123,9 @@ class AdminOperatorController extends Controller
     }
 
     public function restoreAddress (Request $request){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
 
         $zipCodeInfo = ZipCode::find($request->zipcode, true)->getObject();
         
@@ -128,6 +141,9 @@ class AdminOperatorController extends Controller
     }
 
     public function restoreSecondaryAddress (Request $request){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
 
         if (! $secondaryAddress = SecondaryAddress::onlyTrashed()
             ->where('room', $request->room)

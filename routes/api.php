@@ -7,7 +7,6 @@ use App\Http\Controllers\Admin\StudentAccountController;
 use App\Http\Controllers\Admin\ServiceManagementController;
 use App\Http\Controllers\Admin\AddressManagementController;
 use App\Http\Controllers\Admin\SecondaryAddressManagementController;
-use App\Http\Controllers\AppointmentManagementController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -55,11 +54,8 @@ $api->version('v1', function ($api){
                 $api->get('departaments', 'App\Http\Controllers\DepartamentController@index');
                 $api->get('departament/{departament}', 'App\Http\Controllers\DepartamentController@show');
 
-                // DESDE QUE O USUÁRIO/OPERADOR ESTEJA ASSOCIADO OU O COORDENADOR SEJA RESPONSÁVEL PELO DEPARTAMENTO OU SEJA O ADMIN
-                $api->get('appointment/{appointment}', 'App\Http\Controllers\AppointmentManagementController@show');
-
                 // ADMIN
-                $api->group(['middleware' => ['role:admin']], function ($api) {
+                $api->group(['middleware' => ['role:admin,api']], function ($api) {
                     $api->get('admin/home', 'App\Http\Controllers\Admin\AdminOperatorController@index');
 
                     $api->get('accounts/admin', 'App\Http\Controllers\Admin\AdminAccountController@index');
@@ -78,7 +74,7 @@ $api->version('v1', function ($api){
                 });
 
                 // MANAGER / ADMIN
-                $api->group(['middleware' => ['role:admin|manager']], function ($api) {
+                $api->group(['middleware' => ['role:admin|manager,api']], function ($api) {
                     $api->get('accounts/students', 'App\Http\Controllers\Admin\StudentAccountController@index');
                     $api->get('accounts/students/{student}', 'App\Http\Controllers\Admin\StudentAccountController@show');
                 });
@@ -95,8 +91,8 @@ $api->version('v1', function ($api){
                     $api->get('student/appointments/{appointments}', 'App\Http\Controllers\StudentAppointmentController@show');
             });
 
-
-                $api->group(['middleware' => ['role:user']], function ($api) {
+                // USER
+                $api->group(['middleware' => ['role:user,api_users']], function ($api) {
                     $api->get('user/appointments', 'App\Http\Controllers\UserAppointmentController@index'); 
                 });
             });
@@ -154,11 +150,6 @@ $api->version('v1', function ($api){
                 $api->group(['middleware' => ['role:manager']], function ($api){
                     $api->put('manager/appointment/{appointment}', 'App\Http\Controllers\ManagerAppointmentController@update');
                 });
-
-                //VISIVEL A TODOS
-                // DESDE QUE O USUÁRIO/OPERADOR ESTEJA ASSOCIADO OU O COORDENADOR SEJA RESPONSÁVEL PELO DEPARTAMENTO OU SEJA O ADMIN
-                
-
 
                 // RECUPERACAO DE SENHA
                 $api->group(['prefix' => 'recover'], function ($api){

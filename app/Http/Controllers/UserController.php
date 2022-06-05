@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password as PasswordRules;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class UserController extends Controller
 {
@@ -30,7 +31,7 @@ class UserController extends Controller
         return response()->json(['users'=>$users], 200);
     }
 
-    }
+    
 
     /**
      * Store a newly created resource in storage.

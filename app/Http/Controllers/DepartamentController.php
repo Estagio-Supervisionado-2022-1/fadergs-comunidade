@@ -71,6 +71,10 @@ class DepartamentController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
+
         $data = $request->validate([
             'name' => 'required|string|min:3|max:255'
         ]);
@@ -119,6 +123,10 @@ class DepartamentController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
+
         $data = $request->validate([
             'name' => 'required|string|min:3|max:255'
         ]);
@@ -142,6 +150,10 @@ class DepartamentController extends Controller
      */
     public function destroy($id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
+        
         $departament = $this->modelDepartament->find($id);
         
         if (empty($departament)) {

@@ -56,6 +56,10 @@ class SecondaryAddressManagementController extends Controller
      */
     public function store(Request $request)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
+
         $addressData = new addressData();
 
         $validatorReturn = Validator::make(
@@ -117,6 +121,9 @@ class SecondaryAddressManagementController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         $addressData = new AddressData();
 
         if (! $secondaryAddress = SecondaryAddress::where('id', $id)->with('addresses')->first()) {
@@ -243,6 +250,9 @@ class SecondaryAddressManagementController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id){
+        if (!auth('api')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
         if (! $secondaryAddress = SecondaryAddress::find($id)) {
             throw new NotFoundHttpException('Sala não encontrada com o id = ' . $id);
         }
