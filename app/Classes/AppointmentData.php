@@ -47,7 +47,6 @@ class AppointmentData
         $userDepartament = auth()->user()->departament_id;
         $data = collect();
         
-
         foreach ($appointments as $appointment){
             if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
                 $data->push($appointment);
@@ -59,7 +58,6 @@ class AppointmentData
             return $data->groupBy('status', 'service_id');
         }
            
-
         return response()->json(['error' => 'Não foi possível encontrar nenhum agendamento'], 400);
     }
 
@@ -74,20 +72,15 @@ class AppointmentData
         return $appointment;
     }
 
-    public function getAppointmentData($id) {
-
+    public function getAppointmentData($id)
+    {
         $appointment = Appointment::find($id);
         $userDepartament = auth()->user()->departament_id;
-
-            if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
-
-                return $appointment;
-            }
+        if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
+            return $appointment;
+        }
         return response()->json(['error' => 'Não foi possível encontrar nenhum agendamento'], 400);
     }
-
-
-
 
     public function getIndexRulesToValidate()
     {
@@ -98,9 +91,6 @@ class AppointmentData
             ]
         ];
     }
-
-
-
 
     public function getStoreRulesToValidate()
     {

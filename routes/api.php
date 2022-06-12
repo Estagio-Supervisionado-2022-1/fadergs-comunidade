@@ -27,8 +27,6 @@ $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', function ($api){
 
-
-
     // REFERENTE AO LOGIN
     $api->group(['prefix'=> 'auth'], function ($api){
         $api->post('/operator/login', 'App\Http\Controllers\Auth\AuthController@operatorLogin');
@@ -36,7 +34,7 @@ $api->version('v1', function ($api){
         $api->post('/user/signup', 'App\Http\Controllers\UserController@store'); 
         
 
-    // SOMENTE LOGADO
+        // SOMENTE LOGADO
         $api->group(['middleware' => 'api.auth'], function ($api){
             // SESSÃO
             $api->post('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
@@ -69,7 +67,6 @@ $api->version('v1', function ($api){
                     
                     $api->get('admin/appointments', 'App\Http\Controllers\AdminAppointmentController@index');
                     $api->get('admin/appointments/{appointment}', 'App\Http\Controllers\AdminAppointmentController@show');
-
                     
                 });
 
@@ -83,13 +80,13 @@ $api->version('v1', function ($api){
                 $api->group(['middleware' => ['role:manager']], function ($api) {
                     $api->get('manager/appointments', 'App\Http\Controllers\ManagerAppointmentController@index');
                     $api->get('manager/appointments/{appointments}', 'App\Http\Controllers\ManagerAppointmentController@show');
-            });
+                });
                 
                 // STUDENT
                 $api->group(['middleware' => ['role:student']], function ($api) {
                     $api->get('student/appointments', 'App\Http\Controllers\StudentAppointmentController@index');
                     $api->get('student/appointments/{appointments}', 'App\Http\Controllers\StudentAppointmentController@show');
-            });
+                });
 
                 // USER
                 $api->group(['middleware' => ['role:user,api_users']], function ($api) {
@@ -107,8 +104,7 @@ $api->version('v1', function ($api){
                     $api->post('account/manager', 'App\Http\Controllers\Admin\ManagerAccountController@store');
                     $api->post('departament', 'App\Http\Controllers\DepartamentController@store');
                     $api->post('admin/appointment', 'App\Http\Controllers\AdminAppointmentController@store');
-
-            });
+                });
 
                 // MANAGER / ADMIN
                 $api->group(['middleware' => ['role:admin|manager']], function ($api) {
@@ -123,9 +119,7 @@ $api->version('v1', function ($api){
                     $api->post('manager/appointment', 'App\Http\Controllers\ManagerAppointmentController@store');
                 });
 
-
             });
-            
             
             
             // ATUALIZAÇÃO DE DADOS
@@ -186,7 +180,6 @@ $api->version('v1', function ($api){
                     $api->delete('account/student/{student}', 'App\Http\Controllers\Admin\StudentAccountController@destroy');
                     $api->delete('appointment/{appointment}', 'App\Http\Controllers\AdminAppointmentController@destroy');
                 }); 
-
 
             });
        
