@@ -48,18 +48,18 @@ class StudentAccountController extends Controller
 
         if ($operator->userRole == 'admin'){
             if ( $request->pagination) {
-                $students = $operatorData->getDataStudentOperator($request->pagination);
+                $students = $operatorData->getDataStudentOperator($request->pagination, $request->departament);
             }
             else {
-                $students = $operatorData->getDataStudentOperator(10);
+                $students = $operatorData->getDataStudentOperator(10, $request->departament);
             }
         }
         else if ($operator->userRole == 'manager') {
             if ( $request->pagination) {
-                $students = $operatorData->getDataStudentOperatorLikeManager($request->pagination);
+                $students = $operatorData->getDataStudentOperatorLikeManager($request->pagination, $request->departament);
             }
             else {
-                $students = $operatorData->getDataStudentOperatorLikeManager(10);
+                $students = $operatorData->getDataStudentOperatorLikeManager(10, $request->departament);
             }
         }        
 

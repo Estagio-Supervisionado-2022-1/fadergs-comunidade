@@ -21,28 +21,28 @@ class OperatorData {
                
     }
 
-    public function getDataManagerOperator($pagination){
+    public function getDataManagerOperator($pagination, $departament){
         $managers = Operator::role('manager') == null ? 
                                 ['manager_error' => 'Não existem coordenadores cadastrados'] :
-                                Operator::role('manager')->orderBy('name', 'ASC')->get()->groupBy('departament_id');
+                                Operator::role('manager')->where('departament_id', $departament)->orderBy('name', 'ASC')->get();
         return $managers;
         
         
     }
 
-    public function getDataStudentOperator($pagination){
+    public function getDataStudentOperator($pagination, $departament){
         $students = Operator::role('student') == null ?
                                 ['students_error' => 'Não existem alunos cadastrados'] :
-                                Operator::role('student')->orderBy('name', 'ASC')->get()->groupBy('departament_id');
+                                Operator::role('student')->where('departament_id', $departament)->orderBy('name', 'ASC')->get();
 
         return $students;  
         
     }
 
-    public function getDataStudentOperatorLikeManager($pagination){
+    public function getDataStudentOperatorLikeManager($pagination, $departament){
         $students = Operator::role('student') == null ?
                                 ['students_error' => 'Não existem alunos cadastrados'] :
-                                Operator::role('student')->where('departament_id', auth()->user()->departament_id)->orderBy('name', 'ASC')->get()->groupBy('departament_id');
+                                Operator::role('student')->where('departament_id', $departament)->orderBy('name', 'ASC')->get();
 
         return $students;  
         
@@ -117,6 +117,10 @@ class OperatorData {
                 'integer',
                 Rule::in([10, 25, 50, 100])
             ],
+            'departament' =>[
+                'integer',
+                'required'
+            ]
         ];
     }
 

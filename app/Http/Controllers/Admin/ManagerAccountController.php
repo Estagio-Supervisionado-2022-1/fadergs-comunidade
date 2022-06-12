@@ -46,10 +46,10 @@ class ManagerAccountController extends Controller
         }
 
         if ( $request->pagination) {
-            $managers = $operatorData->getDataManagerOperator($request->pagination);
+            $managers = $operatorData->getDataManagerOperator($request->pagination, $request->departament);
         }
         else {
-            $managers = $operatorData->getDataManagerOperator(10);
+            $managers = $operatorData->getDataManagerOperator(10, $request->departament);
         }
 
         return response()->json([
