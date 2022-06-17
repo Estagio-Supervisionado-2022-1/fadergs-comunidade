@@ -107,6 +107,7 @@ class StudentAccountController extends Controller
                 'admin_login' => $request->email,
                 'admin_password' => $password
             ];
+
             Mail::to($request->email)
                 ->send(new OperatorAccountCreation ($loginData));
     
