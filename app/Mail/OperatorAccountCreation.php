@@ -32,7 +32,7 @@ class OperatorAccountCreation extends Mailable
     {
         return $this->view('mails.AdminAccountCreate')
                     ->subject('Conta criada com sucesso!')
-                    ->from('fadergscomunidade@gmail.com', 'Fadergs Comunidade')
+                    ->from(env('MAIL_USERNAME'), 'Fadergs Comunidade')
                     ->with('loginData', $this->loginData);
         
     }
