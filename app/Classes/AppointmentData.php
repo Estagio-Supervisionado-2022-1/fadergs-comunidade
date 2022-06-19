@@ -19,8 +19,8 @@ class AppointmentData
         }
         $appointments = Appointment::where('user_id', $user->id)
             ->orderBy('datetime', 'desc')
-            ->get()
-            ->groupBy('status');
+            ->get();
+
         return $appointments;
     }
 
@@ -55,7 +55,7 @@ class AppointmentData
         }
 
         if ($data->count() > 0) {
-            return $data->groupBy('status', 'service_id');
+            return $data;
         }
            
         return response()->json(['error' => 'Não foi possível encontrar nenhum agendamento'], 400);
