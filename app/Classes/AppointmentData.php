@@ -36,7 +36,7 @@ class AppointmentData
 
     public function getAppointmentDataGroupedByStatusAndDepartament($pagination)
     {
-        $appointments = Appointment::get()->groupBy('status', 'service_id');
+        $appointments = Appointment::get();
 
         return $appointments;
     }
