@@ -13,6 +13,7 @@ class Service extends Model
     protected $softDelete = true;
 
     protected $fillable = ['id', 'name', 'departament_id'];
+    protected $hidden = ['deleted_at', 'updated_at', 'created_at'];
 
     public function departaments (){
         return $this->belongsTo(Departament::class, 'departament_id');

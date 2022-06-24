@@ -44,13 +44,9 @@ class AdminAppointmentController extends Controller
                 'validation errors' => $validatorReturn->errors()
             ]);
         }
-
-        if ( $request->pagination) {
-            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndDepartament($request->pagination);
-        }
-        else {
-            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndDepartament(10);
-        }
+        
+        $appointments = $appointmentData->getAppointmentDataAdmin();
+        
 
         return response()->json([
             'appointments' => $appointments

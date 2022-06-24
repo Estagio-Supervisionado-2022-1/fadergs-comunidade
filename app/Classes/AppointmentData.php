@@ -2,9 +2,13 @@
 
 namespace App\Classes;
 
+use App\Models\Address;
 use App\Models\Appointment;
 use App\Models\Departament;
+use App\Models\Operator;
+use App\Models\SecondaryAddress;
 use App\Models\Service;
+use App\Models\User;
 use Doctrine\Common\Annotations\Annotation\Enum;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
@@ -14,7 +18,7 @@ class AppointmentData
 
     public function getAppointmentsDataByUser($pagination, $user)
     {
-        if (!auth('api_users')->check()){
+        if (!auth('api_users')->check()) {
             abort(400, 'Operador nao eh do tipo usuario');
         }
         $appointments = Appointment::where('user_id', $user->id)
@@ -31,33 +35,63 @@ class AppointmentData
             ->orderBy('datetime', 'desc')
             ->get();
 
-            return $appointments;
+        return $appointments;
     }
 
-    public function getAppointmentDataGroupedByStatusAndDepartament($pagination)
+    public function getAppointmentDataAdmin()
     {
-        $appointments = Appointment::get()->groupBy('status', 'service_id');
+        $appointments = Appointment::orderBy('id', 'ASC')->get();
+        foreach ($appointments as $appointment) {
+            if (!empty($appointment->room_id)) {
+                $appointment->secondaryAddress = SecondaryAddress::find($appointment->room_id);
+                if (!empty($appointment->secondaryAddress->address_id)) {
+                    $appointment->secondaryAddress->address = Address::find($appointment->secondaryAddress->address_id);
+                }
+            }
+
+            if (!empty($appointment->user_id)) {
+                $appointment->user = User::find($appointment->user_id);
+            }
+
+            if (!empty($appointment->operator_id)){
+                $appointment->operator = Operator::find($appointment->operator_id);
+            }
+
+            if (!empty($appointment->service_id)){
+                $appointment->service = Service::find($appointment->service_id);
+                if (!empty($appointment->service->departament_id)){
+                    $appointment->service->departament = Departament::find($appointment->service->departament_id);
+                }
+            }
+      
+        }
+
 
         return $appointments;
     }
 
-    public function getAppointmentDataGroupedByStatusAndService($pagination)
+    public function getAppointmentDataManager()
     {
         $appointments = Appointment::get();
         $userDepartament = auth()->user()->departament_id;
-        $data = collect();
-        
-        foreach ($appointments as $appointment){
-            if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
-                $data->push($appointment);
-                
-            }
-        }
+        // $data = collect();
 
-        if ($data->count() > 0) {
-            return $data;
-        }
-           
+        // foreach ($appointments as $appointment) {
+            
+            
+            
+        //     // if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
+        //     //     $data->push($appointment);
+        //     // }
+        // }
+
+
+        // die(response()->json($data));
+
+        // if ($data->count() > 0) {
+        //     return $data;
+        // }
+
         return response()->json(['error' => 'Não foi possível encontrar nenhum agendamento'], 400);
     }
 

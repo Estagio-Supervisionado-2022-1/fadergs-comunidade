@@ -41,12 +41,8 @@ class ManagerAppointmentController extends Controller
             ]);
         }
 
-        if ( $request->pagination) {
-            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndService($request->pagination);
-        }
-        else {
-            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndService(10);
-        }
+        $appointments = $appointmentData->getAppointmentDataManager($request->pagination);
+ 
 
         return response()->json([
             'appointments' => $appointments

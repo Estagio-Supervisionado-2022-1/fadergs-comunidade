@@ -23,7 +23,7 @@ class SecondaryAddress extends Model
     ];
 
     protected $hidden = [
-        'created_at', 'updated_at', 'deleted_at'
+        'created_at', 'updated_at', 'deleted_at', 'address_id'
     ];
 
     public function addresses() {

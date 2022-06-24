@@ -9,6 +9,7 @@ class Appointment extends Model
 {
     protected $softDelete = true;
     protected $fillable = ['service_id', 'datetime', 'service_id', 'address_id', 'user_id'];
+    protected $hidden = ['deleted_at', 'room_id', 'service_id', 'user_id', 'operator_id'];
 
     public function addresses (){
         return $this->hasMany(Address::class, 'address_id');

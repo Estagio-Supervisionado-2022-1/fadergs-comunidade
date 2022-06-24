@@ -13,6 +13,7 @@ class Departament extends Model
     protected $softDelete = true;
 
     protected $fillable = ['name'];
+    protected $hidden = ['deleted_at', 'updated_at', 'created_at'];
 
     public static $attrMakeHidden = ['id', 'updated_at', 'created_at', 'deleted_at'];
 
