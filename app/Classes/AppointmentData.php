@@ -72,18 +72,19 @@ class AppointmentData
 
     public function getAppointmentDataManager()
     {
-        $appointments = Appointment::get();
+        $appointments = Appointment::orderBy('id', 'ASC')->get();
+        
         $userDepartament = auth()->user()->departament_id;
-        // $data = collect();
+        
 
-        // foreach ($appointments as $appointment) {
+        foreach ($appointments as $appointment) {
             
             
             
-        //     // if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
-        //     //     $data->push($appointment);
-        //     // }
-        // }
+            if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
+                $data->push($appointment);
+            }
+        }
 
 
         // die(response()->json($data));
