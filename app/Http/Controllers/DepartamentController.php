@@ -128,7 +128,8 @@ class DepartamentController extends Controller
         }
 
         $data = $request->validate([
-            'name' => 'required|string|min:3|max:255'
+            'name' => 'required|string|min:3|max:255',
+            'description' => 'required|string|min:10|max:255'
         ]);
         
         $departament = $this->modelDepartament->find($id);

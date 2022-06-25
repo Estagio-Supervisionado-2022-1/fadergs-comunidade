@@ -19,30 +19,30 @@ class ServiceManagementController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request){
-        
+    public function index(Request $request)
+    {
+
         $serviceData = new ServiceData();
 
         $validatorReturn = Validator::make(
-            $request->all(), 
-            $serviceData->getIndexRulesToValidate(), 
+            $request->all(),
+            $serviceData->getIndexRulesToValidate(),
             $serviceData->getErrorMessagesToValidate()
         );
 
-        if ($validatorReturn->fails()){
+        if ($validatorReturn->fails()) {
             return response()->json([
                 'validation errors' => $validatorReturn->errors()
             ], 400);
         }
 
-        if ( $request->pagination) {
-            $services = $serviceData->getServiceData ($request->pagination);
-        }
-        else {
+        if ($request->pagination) {
+            $services = $serviceData->getServiceData($request->pagination);
+        } else {
             $services = $serviceData->getServiceData(10);
         }
 
-        
+
         return response()->json([
             'services' => $services
         ]);
@@ -53,20 +53,21 @@ class ServiceManagementController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request){
-        if (!auth('api')->check()){
+    public function store(Request $request)
+    {
+        if (!auth('api')->check()) {
             abort(400, 'usuario nao possui permissao');
         }
         $serviceData = new ServiceData();
 
         $validatorReturn = Validator::make(
-            $request->all(), 
-            $serviceData->getStoreRulesToValidate(), 
+            $request->all(),
+            $serviceData->getStoreRulesToValidate(),
             $serviceData->getErrorMessagesToValidate()
         );
 
 
-        if ($validatorReturn->fails()){
+        if ($validatorReturn->fails()) {
             return response()->json([
                 'validation errors' => $validatorReturn->errors(), 400
             ]);
@@ -74,7 +75,7 @@ class ServiceManagementController extends Controller
 
         try {
 
-            if (! $departament = Departament::find($request->departament_id)){
+            if (!$departament = Departament::find($request->departament_id)) {
                 throw new NotFoundHttpException('Departamento não encontrado com o id = ' . $request->departament_id);
             }
 
@@ -84,14 +85,12 @@ class ServiceManagementController extends Controller
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]);
-
         } catch (JWTException $e) {
             throw $e;
         }
 
         return response()->json(['message_success' => 'Departamento criado com sucesso!'])
-                            ->setStatusCode(201);
-
+            ->setStatusCode(201);
     }
 
     /**
@@ -100,8 +99,9 @@ class ServiceManagementController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id){
-        if (! $service = Service::where('id', $id)->with('departaments')->first()) {
+    public function show($id)
+    {
+        if (!$service = Service::where('id', $id)->with('departaments')->first()) {
             throw new NotFoundHttpException('Serviço não encontrado com o id = ' . $id);
         }
 
@@ -115,60 +115,80 @@ class ServiceManagementController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id) {
-        if (!auth('api')->check()){
+    public function update(Request $request, $id)
+    {
+        if (!auth('api')->check()) {
             abort(400, 'usuario nao possui permissao');
         }
         $serviceData = new ServiceData();
 
-        if (! $service = Service::where('id', $id)->with('departaments')->first()) {
+        if (!$service = Service::where('id', $id)->with('departaments')->first()) {
             throw new NotFoundHttpException('Serviço não encontrado com o id = ' . $id);
         }
-            if (!empty($request->name)){
-                $validatorReturn = Validator::make($request->all(), [
-                    'name'          => [
-                        'required',
-                        'string',
-                        'min:3',
-                        'max:50'
-                    ]
-                ], $serviceData->getErrorMessagesToValidate());
-            
+        if (!empty($request->name)) {
+            $validatorReturn = Validator::make($request->all(), [
+                'name'          => [
+                    'required',
+                    'string',
+                    'min:3',
+                    'max:50'
+                ]
+            ], $serviceData->getErrorMessagesToValidate());
 
-                if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
-                }
 
-                $service->updateOrCreate(['id' => $service->id], [
-                    'name' => $request->name,
-                ]);
-
+            if ($validatorReturn->fails()) {
+                return response()->json(['errors' => $validatorReturn->errors()]);
             }
 
-            if (!empty($request->departament_id)){
-                $validatorReturn = Validator::make($request->all(), [
-                    'departament_id' => [
-                        'required',
-                        'integer'
-                    ]
-                ], $serviceData->getErrorMessagesToValidate());
-            
+            $service->updateOrCreate(['id' => $service->id], [
+                'name' => $request->name
+            ]);
+        }
 
-                if ($validatorReturn->fails()){
-                    return response()->json(['errors' => $validatorReturn->errors()]);
-                }
 
-                
+        if (!empty($request->description)) {
+            $validatorReturn = Validator::make($request->all(), [
+                'description' => [
+                    'required',
+                    'string',
+                    'min:10',
+                    'max:255'
+                ]
+            ], $serviceData->getErrorMessagesToValidate());
 
-                if (! $departament = Departament::find($request->departament_id)){
-                    throw new NotFoundHttpException('Departamento não encontrado com o id = ' . $request->departament_id);
-                }
-                
-                $service->updateOrCreate(['id' => $id], [
-                    'departament_id' => $departament->id,
-                ]);
-            
-            
+
+            if ($validatorReturn->fails()) {
+                return response()->json(['errors' => $validatorReturn->errors()]);
+            }
+
+            $service->updateOrCreate(['id' => $service->id], [
+                'description' => $request->description
+            ]);
+        }
+
+        if (!empty($request->departament_id)) {
+            $validatorReturn = Validator::make($request->all(), [
+                'departament_id' => [
+                    'required',
+                    'integer'
+                ]
+            ], $serviceData->getErrorMessagesToValidate());
+
+
+            if ($validatorReturn->fails()) {
+                return response()->json(['errors' => $validatorReturn->errors()]);
+            }
+
+
+            if (!$departament = Departament::find($request->departament_id)) {
+                throw new NotFoundHttpException('Departamento não encontrado com o id = ' . $request->departament_id);
+            }
+
+            $service->updateOrCreate(['id' => $id], [
+                'departament_id' => $departament->id,
+            ]);
+
+
             $response = [
                 'message' => 'Serviço atualizado com sucesso',
                 'id' => $id
@@ -178,7 +198,6 @@ class ServiceManagementController extends Controller
         }
 
         return response()->json(['message_fail' => 'Não foi possível criar o serviço, entre em contato com o administrador'], 400);
-
     }
 
     /**
@@ -189,16 +208,15 @@ class ServiceManagementController extends Controller
      */
     public function destroy($id)
     {
-        if (!auth('api')->check()){
+        if (!auth('api')->check()) {
             abort(400, 'usuario nao possui permissao');
         }
-        if (! $service = Service::find($id)) {
+        if (!$service = Service::find($id)) {
             throw new NotFoundHttpException('Serviço não encontrado com o id = ' . $id);
         }
         try {
-                $service->delete();
-                return response()->json(['message' => 'Serviço desativado com sucesso']);
-                        
+            $service->delete();
+            return response()->json(['message' => 'Serviço desativado com sucesso']);
         } catch (HttpException $e) {
             throw $e;
         }
