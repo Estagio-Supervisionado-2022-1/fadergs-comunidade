@@ -37,12 +37,10 @@ class ServiceManagementController extends Controller
         }
 
         if ($request->pagination) {
-            $services = $serviceData->getServiceData($request->pagination);
+            $services = $serviceData->getServiceData($request->pagination,$request->departament );
         } else {
-            $services = $serviceData->getServiceData(10);
+            $services = $serviceData->getServiceData(10, $request->departament);
         }
-
-
         return response()->json([
             'services' => $services
         ]);
