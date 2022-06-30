@@ -41,12 +41,7 @@ class StudentAppointmentController extends Controller
             ]);
         }
 
-        if ( $request->pagination) {
-            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndService($request->pagination);
-        }
-        else {
-            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndService(10);
-        }
+        $appointments = $appointmentData->getAppointmentDataByDepartament();
 
         return response()->json([
             'appointments' => $appointments

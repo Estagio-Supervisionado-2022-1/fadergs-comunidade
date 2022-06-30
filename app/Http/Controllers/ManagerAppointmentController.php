@@ -41,7 +41,7 @@ class ManagerAppointmentController extends Controller
             ]);
         }
 
-        $appointments = $appointmentData->getAppointmentDataManager($request->pagination);
+        $appointments = $appointmentData->getAppointmentDataByDepartament();
  
 
         return response()->json([
@@ -132,9 +132,14 @@ class ManagerAppointmentController extends Controller
         if (!auth('api')->check()){
             abort(400, 'usuario nao possui permissao');
         }
+
+        if (count($request->all()) <= 0){
+            return response(['message' => 'não foram informados parametros'], 400);
+        }
         $appointmentData = new AppointmentData();
 
         $appointment = $appointmentData->getAppointmentData($id);
+
         
         if (!empty($request->status)) {
             $validatorReturn = Validator::make($request->all(), [

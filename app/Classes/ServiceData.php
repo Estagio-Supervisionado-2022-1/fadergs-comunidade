@@ -7,10 +7,10 @@ use Illuminate\Validation\Rule;
 
 class ServiceData {
 
-    public function getServiceData ($pagination){
+    public function getServiceData ($departament){
         $services = Service::all()->isEmpty() ?
                             ['service_error' => 'Não existem serviços cadastrados'] :
-                            Service::with('departaments')->get();
+                            Service::where('departament_id', $departament)->get();
 
         return $services;  
     }
@@ -26,9 +26,9 @@ class ServiceData {
 
     public function getIndexRulesToValidate(){
         return [
-            'pagination' => [
+            'departament' => [
                 'integer',
-                Rule::in([10, 25, 50, 100])
+                Rule::exists('departaments', 'id'),
             ]
         ];
     }

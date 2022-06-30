@@ -91,6 +91,7 @@ $api->version('v1', function ($api){
                 // USER
                 $api->group(['middleware' => ['role:user,api_users']], function ($api) {
                     $api->get('user/appointments', 'App\Http\Controllers\UserAppointmentController@index'); 
+                    $api->get('user/appointments/{appointments}', 'App\Http\Controllers\UserAppointmentController@show'); 
                 });
             });
 
@@ -143,6 +144,11 @@ $api->version('v1', function ($api){
 
                 $api->group(['middleware' => ['role:manager']], function ($api){
                     $api->put('manager/appointment/{appointment}', 'App\Http\Controllers\ManagerAppointmentController@update');
+                });
+
+                // USER
+                $api->group(['middleware' => ['role:user,api_users']], function ($api) {
+                    $api->put('user/appointment/{appointment}', 'App\Http\Controllers\UserAppointmentController@update'); 
                 });
 
                 // RECUPERACAO DE SENHA

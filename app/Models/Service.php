@@ -12,7 +12,7 @@ class Service extends Model
 
     protected $softDelete = true;
 
-    protected $fillable = ['id', 'name', 'departament_id'];
+    protected $fillable = ['id', 'name', 'departament_id', 'duration', 'description'];
     protected $hidden = ['deleted_at', 'updated_at', 'created_at'];
 
     public function departaments (){

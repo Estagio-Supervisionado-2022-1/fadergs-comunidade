@@ -29,7 +29,7 @@ class UserAppointmentController extends Controller
 
     public function __construct(Request $request)
     {
-        if (!auth(self::GUARD)->check()) {
+        if (!auth()->guard(self::GUARD)->check()) {
             abort(Response::HTTP_UNAUTHORIZED);
         }
         $this->request = $request;
@@ -60,14 +60,10 @@ class UserAppointmentController extends Controller
             ], Response::HTTP_BAD_REQUEST);
         }
 
-        if ($request->has('pagination') && $request->pagination > 10) {
-            $pagination = $request->pagination;
-        } else {
-            $pagination = 10;
-        }
-        $appointments = $appointmentData->getAppointmentsDataByUser($pagination, $user);
+        
+        $appointments = $appointmentData->getAppointmentsDataByUser($user);
         return response()->json([
-            'appointments' => $appointments
+            $appointments
         ]);
         
     }

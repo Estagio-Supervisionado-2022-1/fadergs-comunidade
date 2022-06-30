@@ -16,10 +16,10 @@ class AddressSeeder extends Seeder
      */
     public function run()
     {
-        $zipcodes = ['90020-061', '90010-273', '90020-090', '90010-170', '90020-023'];
+        $zipcodes = ['90020061', '90010273', '90020090', '90010170', '90020023'];
 
         foreach ($zipcodes as $zipcode){
-            $zipCodeInfo = ZipCode::find($zipcode)->getObject();
+            $zipCodeInfo = ZipCode::find($zipcode, true)->getObject();
             Address::insert([
                 'zipcode'              => $zipCodeInfo->cep,
                 'streetName'    => $zipCodeInfo->logradouro,

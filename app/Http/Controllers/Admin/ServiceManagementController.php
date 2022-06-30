@@ -34,17 +34,12 @@ class ServiceManagementController extends Controller
                 'validation errors' => $validatorReturn->errors()
             ], 400);
         }
-
-        if ( $request->pagination) {
-            $services = $serviceData->getServiceData ($request->pagination);
-        }
-        else {
-            $services = $serviceData->getServiceData(10);
-        }
-
+        
+        $services = $serviceData->getServiceData($request->departament);
+       
         
         return response()->json([
-            'services' => $services
+            $services
         ]);
     }
     /**
@@ -81,6 +76,8 @@ class ServiceManagementController extends Controller
             $service = Service::withTrashed()->firstOrCreate([
                 'name'              => $request->name,
                 'departament_id'    => $departament->id,
+                'duration'          => $request->duration,
+                'description'       => 'Lorem ipsum description',
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]);
