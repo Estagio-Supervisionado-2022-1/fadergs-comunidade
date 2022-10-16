@@ -52,12 +52,13 @@ class UserController extends Controller
                 'required',
                 'email',
                 'max:255',
-                'unique:operators,email'
+                'unique:users,email'
             ],
             'cpf' => [
                 'required',
                 'string',
-                'regex:/^[0-9]{11}/'
+                'regex:/^[0-9]{11}/',
+                'unique:users,cpf'
             ],
             'telphone' => [
                 'string',
@@ -76,13 +77,27 @@ class UserController extends Controller
 
         $validatorReturn = Validator::make($request->all(), $rulesToValidate);
         if ($validatorReturn->fails()){
-            return response()->json([
-                'validation errors' => $validatorReturn->errors()
-            ]);
+            if($validatorReturn->errors()->has('email') && $validatorReturn->errors()->has('cpf')) {
+                return (response()->json([
+                    'validation errors' => $validatorReturn->errors()
+                ], 409));
+            } else {
+                return response()->json([
+                    'validation errors' => $validatorReturn->errors()
+                ], 400);
+            }
         }
+
+        // $uniqueNames = User::select('email')->distinct()->pluck('email')->toArray();
+
+        // empty($uniqueNames)
+
+
         $user = User::create([
             'name'              => $request->name,
             'email'             => $request->email,
+            'cpf'               => $request->cpf,
+            'telphone'          => $request->telphone,
             'password'          => $request->password,
             'created_at'        => now(),
             'updated_at'        => now()
