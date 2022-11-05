@@ -128,6 +128,7 @@ $api->version('v1', function ($api){
                 // ADMIN
                 $api->group(['middleware' => ['role:admin']], function ($api) {
                     $api->put('account/admin/{admin}', 'App\Http\Controllers\Admin\AdminAccountController@update');
+                    $api->put('account/user/{user}', 'App\Http\Controllers\UserController@update');
                     $api->put('account/manager/{manager}', 'App\Http\Controllers\Admin\ManagerAccountController@update');
                     $api->put('departament/{departament}', 'App\Http\Controllers\DepartamentController@update');
                     $api->put('admin/appointment/{appointment}', 'App\Http\Controllers\AdminAppointmentController@update');
