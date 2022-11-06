@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Classes\AppointmentData;
 use App\Mail\AppointmentModifiedMessage;
+use App\Models\Appointment;
 use App\Models\SecondaryAddress;
 use App\Models\Service;
 use App\Models\User;
@@ -80,7 +81,47 @@ class UserAppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if (!auth('api_users')->check()){
+            abort(400, 'usuario nao possui permissao');
+        }
+        $appointmentData = new AppointmentData();
+        $data = [];
+
+        foreach ($request->all() as $request){
+            $validationReturn = Validator::make(
+                $request,
+                $appointmentData->getStoreRulesToValidate()
+            );
+    
+            if ($validationReturn->fails()){
+                return response()->json([
+                    'validation errors' => $validationReturn->errors(), 
+                ])->setStatusCode(400);
+            }
+
+            array_push($data, [
+                'datetime' => $request['datetime'], 
+                'status' => 'Aguardando Confirmação',
+                'service_id' => $request['service_id'],
+                'operator_id' => isset($request['operator_id']) ? $request['operator_id'] : null,
+                'room_id' => isset($request['address_id']) ? $request['address_id'] : null,
+                'user_id' => isset($request['user_id']) ? $request['user_id'] : null,
+                'compareceu' => false,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+
+        }
+        
+
+        try {
+            Appointment::insert($data);
+        }
+        catch (JWTException $e) {
+            throw $e;
+        }
+
+        return response()->json(array('success' => 'Agendamento criado com sucesso'), 201);
     }
 
     /**

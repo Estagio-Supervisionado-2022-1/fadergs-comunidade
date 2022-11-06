@@ -119,6 +119,10 @@ $api->version('v1', function ($api){
                     $api->post('manager/appointment', 'App\Http\Controllers\ManagerAppointmentController@store');
                 });
 
+                $api->group(['middleware' => ['role:user,api_users']], function ($api){
+                    $api->post('user/appointment', 'App\Http\Controllers\UserAppointmentController@store');
+                });
+
             });
             
             
