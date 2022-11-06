@@ -179,15 +179,15 @@ class UserController extends Controller
                 'email',
                 'max:255'
             ],
-            'password'      => [
+            'cpf' => [
                 'required',
                 'string',
-                PasswordRules::min(8)
-                            ->mixedCase()
-                            ->numbers()
-                            ->symbols()
-                            ->uncompromised()
-            ]
+                'regex:/^[0-9]{11}/',
+            ],
+            'telphone' => [
+                'string',
+                'min:11'
+            ],
         ];
         $validatorReturn = Validator::make($request->all(), $rulesToValidate);
         if ($validatorReturn->fails()){
@@ -203,9 +203,10 @@ class UserController extends Controller
         }
 
         $user->update([
-            "name" => $request->name,
-            "email" => $request->email,
-            "password" => $request->password,
+            'name'       => $request->name,
+            'email'      => $request->email,
+            'cpf'        => $request->cpf,
+            'telphone'   => $request->telphone,
             'updated_at' => now()
         ]);
 
