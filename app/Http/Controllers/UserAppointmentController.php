@@ -66,7 +66,9 @@ class UserAppointmentController extends Controller
         } else {
             $pagination = 10;
         }
+        
         $appointments = $appointmentData->getAppointmentsDataByUser($pagination, $user);
+
         return response()->json([
             'appointments' => $appointments
         ]);
@@ -158,19 +160,31 @@ class UserAppointmentController extends Controller
 
         $appointmentData = new AppointmentData();
 
-        $appointment = $appointmentData->getAppointmentData($id);
+        if(empty($id)) {
+            return response()->json(['error' => 'O id do agendamento deve ser informado'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $appointment = $appointmentData->getAppointmentDataWithoutWhere($id);
         
         $user = $this->user;
 
-        if ($user->id != $appointment->user_id) {
+        if(empty($appointment)) {
+            return response()->json(['error' => 'Agendamento não encontrado'], Response::HTTP_UNAUTHORIZED);
+        }
+    
+        if ($appointment->user_id && $user->id != $appointment->user_id) {
             return response()->json(['error' => 'Você não pode alterar esse agendamento'], Response::HTTP_UNAUTHORIZED);
         }
 
+        if(!isset($request->user_id)) {
+            return response()->json(['error' => 'O id do usuário deve ser informado'], Response::HTTP_UNAUTHORIZED);
+        }
+       
         if (!empty($request->status)) {
             $validatorReturn = Validator::make($request->all(), [
                 'status'          => [
                     'required',
-                    Rule::in(['Cancelado'])
+                    Rule::in(['Aguardando Confirmação','Cancelado'])
                 ]
             ]);
 
@@ -182,8 +196,16 @@ class UserAppointmentController extends Controller
                 return response()->json(['error' => 'Não é possível alterar o status'], Response::HTTP_UNAUTHORIZED);
             }
 
-            $appointment->update(['id' => $appointment->id], [
-                'status' => $request->status
+            $appointmentUpdate = Appointment::find($id);
+
+            if (empty($appointmentUpdate)) {
+                return abort(404);
+            }
+
+            $appointmentUpdate->update([
+                'status'     => $request->status,
+                'user_id'    => $request->user_id,
+                'updated_at' => now()
             ]);
         }
 

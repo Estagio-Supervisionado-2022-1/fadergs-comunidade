@@ -49,6 +49,8 @@ $api->version('v1', function ($api){
                 $api->get('addresses', 'App\Http\Controllers\Admin\SecondaryAddressManagementController@index');
                 $api->get('addresses/{address}', 'App\Http\Controllers\Admin\SecondaryAddressManagementController@show');
 
+                $api->get('appointments', 'App\Http\Controllers\AppointmentController@index');
+
                 $api->get('departaments', 'App\Http\Controllers\DepartamentController@index');
                 $api->get('departament/{departament}', 'App\Http\Controllers\DepartamentController@show');
 
@@ -146,8 +148,14 @@ $api->version('v1', function ($api){
                     $api->put('address/{secondary}', 'App\Http\Controllers\Admin\SecondaryAddressManagementController@update');
                 });
 
+                //MANAGER
                 $api->group(['middleware' => ['role:manager']], function ($api){
                     $api->put('manager/appointment/{appointment}', 'App\Http\Controllers\ManagerAppointmentController@update');
+                });
+
+                //USER
+                $api->group(['middleware' => ['role:user,api_users']], function ($api){
+                    $api->put('user/appointment/{appointment}', 'App\Http\Controllers\UserAppointmentController@update');
                 });
 
                 // RECUPERACAO DE SENHA

@@ -3,8 +3,9 @@
 namespace App\Classes;
 
 use App\Models\Appointment;
-use App\Models\Departament;
 use App\Models\Service;
+use App\Models\Address;
+use App\Models\Departament;
 use Doctrine\Common\Annotations\Annotation\Enum;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
@@ -18,8 +19,27 @@ class AppointmentData
             abort(400, 'Operador nao eh do tipo usuario');
         }
         $appointments = Appointment::where('user_id', $user->id)
+            ->join('operators', 'appointments.operator_id', '=', 'operators.id')
+            ->join('services', 'appointments.service_id', '=', 'services.id')
+            ->join('secondary_addresses', 'appointments.room_id', '=', 'secondary_addresses.id')
+            ->join('addresses', 'secondary_addresses.address_id', '=', 'addresses.id')
             ->orderBy('datetime', 'desc')
-            ->get();
+            ->get([
+                'appointments.id as id',
+                'appointments.status as appointment_status',
+                'appointments.datetime as appointment_datetime',
+                'operators.name as operator_name',
+                'secondary_addresses.description as address_description',
+                'secondary_addresses.floor as address_floor',
+                'secondary_addresses.room as address_room',
+                'secondary_addresses.building_number as address_number',
+                'addresses.zipcode as address_zipcode',
+                'addresses.streetName as address_street',
+                'addresses.district as address_district',
+                'addresses.city as address_city',
+                'addresses.stateAbbr as address_state',
+                'services.name as service_name'
+            ]);
 
         return $appointments;
     }
@@ -77,6 +97,15 @@ class AppointmentData
         $appointment = Appointment::find($id);
         $userDepartament = auth()->user()->departament_id;
         if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
+            return $appointment;
+        }
+        return response()->json(['error' => 'Não foi possível encontrar nenhum agendamento'], 400);
+    }
+
+    public function getAppointmentDataWithoutWhere($id)
+    {
+        $appointment = Appointment::find($id);
+        if ($appointment) {
             return $appointment;
         }
         return response()->json(['error' => 'Não foi possível encontrar nenhum agendamento'], 400);
