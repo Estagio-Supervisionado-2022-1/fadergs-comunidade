@@ -68,7 +68,6 @@ class OperatorController extends Controller
         $operator = Operator::create([
             'name'              => $request->name,
             'email'             => $request->email,
-            'password'          => $request->password,
             'departament_id'    => $request->departament_id,
             'created_at'        => now(),
             'updated_at'        => now(),
