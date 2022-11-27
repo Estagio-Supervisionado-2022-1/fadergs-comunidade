@@ -80,6 +80,8 @@ class ServiceManagementController extends Controller
             $service = Service::withTrashed()->firstOrCreate([
                 'name'              => $request->name,
                 'departament_id'    => $departament->id,
+                'description'       => $request->description,
+                'duration'          => $request->duration,
                 'created_at'        => now(),
                 'updated_at'        => now(),
             ]);
