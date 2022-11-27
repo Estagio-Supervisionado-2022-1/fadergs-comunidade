@@ -33,7 +33,7 @@ class AppointmentModifiedMessage extends Mailable
     {
         return $this->view('mails.AppointmentModifiedMessage')
                     ->subject('Fadergs Comunidade - Novas informações sobre o seu agendamento')
-                    ->from('fadergscomunidade@gmail.com', 'Fadergs Comunidade')
+                    ->from(env('MAIL_USERNAME'), 'Fadergs Comunidade')
                     ->with([
                         'appointment' => $this->appointment,
                         'user' => $this->user,

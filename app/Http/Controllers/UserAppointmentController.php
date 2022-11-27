@@ -214,7 +214,7 @@ class UserAppointmentController extends Controller
             'id' => $id
         ];
 
-        return response()->json($response);
+        return response()->json($response)->setStatusCode(200);;
 
     }
 

@@ -143,7 +143,6 @@ $api->version('v1', function ($api){
                 // MANAGER / ADMIN
                 $api->group(['middleware' => ['role:admin|manager']], function ($api) {
                     $api->put('service/{service}', 'App\Http\Controllers\Admin\ServiceManagementController@update');
-                    $api->put('account/student/{student}', 'App\Http\Controllers\Admin\StudentAccountController@update');
                     $api->put('main/address/{address}', 'App\Http\Controllers\Admin\AddressManagementController@update');
                     $api->put('address/{secondary}', 'App\Http\Controllers\Admin\SecondaryAddressManagementController@update');
                 });
@@ -151,6 +150,11 @@ $api->version('v1', function ($api){
                 //MANAGER
                 $api->group(['middleware' => ['role:manager']], function ($api){
                     $api->put('manager/appointment/{appointment}', 'App\Http\Controllers\ManagerAppointmentController@update');
+                });
+
+                //STUDENT
+                $api->group(['middleware' => ['role:student']], function ($api){
+                    $api->put('account/student/{student}', 'App\Http\Controllers\Admin\StudentAccountController@update');
                 });
 
                 //USER

@@ -42,10 +42,18 @@ class StudentAppointmentController extends Controller
         }
 
         if ( $request->pagination) {
-            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndService($request->pagination);
-        }
-        else {
-            $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndService(10);
+            if($request->operator) {
+                $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndServiceAndOperator($request->pagination, $request->operator);
+            } else {
+
+            } $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndService($request->pagination);
+            
+        } else {
+            if($request->operator) {
+                $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndServiceAndOperator(10, $request->operator);
+            } else {
+                $appointments = $appointmentData->getAppointmentDataGroupedByStatusAndService(10);
+            }
         }
 
         return response()->json([
@@ -135,7 +143,7 @@ class StudentAppointmentController extends Controller
                 return response()->json(['error' => 'Não é possível confirmar a presença, verifique se o usuário foi atendido'], 401);
             }
 
-            $appointment->update (['id' => $appointment->id], [
+            $appointment->update ([
                 'compareceu' => $request->compareceu
             ]);
 
@@ -172,7 +180,7 @@ class StudentAppointmentController extends Controller
                 return response()->json(['errors' => $validatorReturn->errors()], 400);
             }
 
-            $appointment->update (['id' => $appointment->id], [
+            $appointment->update ([
                 'user_id' => $request->user_id
             ]);
         }
@@ -189,7 +197,7 @@ class StudentAppointmentController extends Controller
                 }
 
                 if ($request->signItself == true && $appointment->operator_id == null) {
-                    $appointment->update(['id' => $appointment->id], [
+                    $appointment->update([
                         'operator_id' => auth()->user()->id,
                     ]);
                 }

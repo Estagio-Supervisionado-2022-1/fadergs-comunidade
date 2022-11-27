@@ -81,6 +81,26 @@ class AppointmentData
         return response()->json(['error' => 'Não foi possível encontrar nenhum agendamento'], 400);
     }
 
+    public function getAppointmentDataGroupedByStatusAndServiceAndOperator($pagination, $operator_id)
+    {
+        $appointments = Appointment::get()->where('operator_id', $operator_id);
+        $userDepartament = auth()->user()->departament_id;
+        $data = collect();
+        
+        foreach ($appointments as $appointment){
+            if (Service::where('departament_id', $userDepartament)->where('id', $appointment->service_id)->exists()) {
+                $data->push($appointment);
+                
+            }
+        }
+
+        if ($data->count() > 0) {
+            return $data;
+        }
+           
+        return response()->json(['error' => 'Não foi possível encontrar nenhum agendamento'], 400);
+    }
+
     public function getAppointmentLikeAdmin($id)
     {
         $appointment = Appointment::find($id);

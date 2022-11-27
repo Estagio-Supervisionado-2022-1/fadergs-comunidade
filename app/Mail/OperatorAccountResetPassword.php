@@ -29,7 +29,7 @@ class OperatorAccountResetPassword extends Mailable
     public function build(){
         return $this->view('mails.AdminAccountUpdate')
                     ->subject('Novos Dados de Acesso')
-                    ->from('fadergscomunidade@gmail.com', 'Fadergs Comunidade')
+                    ->from(env('MAIL_USERNAME'), 'Fadergs Comunidade')
                     ->with('loginData', $this->loginData);
         
     }
