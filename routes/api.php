@@ -32,7 +32,9 @@ $api->version('v1', function ($api){
         $api->post('/operator/login', 'App\Http\Controllers\Auth\AuthController@operatorLogin');
         $api->post('/user/login', 'App\Http\Controllers\Auth\AuthController@userLogin');
         $api->post('/user/signup', 'App\Http\Controllers\UserController@store'); 
-        
+
+        $api->post('operators/reset', 'App\Http\Controllers\OperatorController@resetPassword');
+        $api->post('users/reset', 'App\Http\Controllers\UserController@resetPassword');
 
         // SOMENTE LOGADO
         $api->group(['middleware' => 'api.auth'], function ($api){
@@ -69,6 +71,8 @@ $api->version('v1', function ($api){
                     
                     $api->get('admin/appointments', 'App\Http\Controllers\AdminAppointmentController@index');
                     $api->get('admin/appointments/{appointment}', 'App\Http\Controllers\AdminAppointmentController@show');
+
+                    $api->get('accounts/user', 'App\Http\Controllers\UserController@index');
                     
                 });
 
@@ -155,6 +159,7 @@ $api->version('v1', function ($api){
                 //STUDENT
                 $api->group(['middleware' => ['role:student']], function ($api){
                     $api->put('account/student/{student}', 'App\Http\Controllers\Admin\StudentAccountController@update');
+                    $api->put('student/appointment/{appointment}', 'App\Http\Controllers\StudentAppointmentController@update');
                 });
 
                 //USER
@@ -165,7 +170,8 @@ $api->version('v1', function ($api){
                 // RECUPERACAO DE SENHA
                 $api->group(['prefix' => 'recover'], function ($api){
                     $api->post('operators/email/recover', 'App\Http\Controllers\OperatorController@sendEmailResetPassword');
-                    $api->post('operators/reset', 'App\Http\Controllers\OperatorController@resetPassword');
+
+                    $api->post('users/email/recover', 'App\Http\Controllers\UserController@sendEmailResetPassword');
 
                     $api->group(['middleware' => ['role:admin']], function ($api) {
                         $api->post('operator', 'App\Http\Controllers\Admin\AdminOperatorController@restoreOperator');
@@ -177,7 +183,6 @@ $api->version('v1', function ($api){
                         $api->post('address', 'App\Http\Controllers\Admin\AdminOperatorController@restoreSecondaryAddress');
                     });
                 });
-
             });
 
             // DELETAR DADOS

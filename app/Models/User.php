@@ -4,12 +4,14 @@ namespace App\Models;
 
 use App\Notifications\PasswordReset;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Mail\UserAccountResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Support\Facades\Mail;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -80,6 +82,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new PasswordReset($token));
+        Mail::to($this->attributes['email'])
+        ->send(new UserAccountResetPassword ($token));
     }
 }

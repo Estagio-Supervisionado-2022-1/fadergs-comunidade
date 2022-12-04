@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Mail\OperatorAccountResetPassword;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\PasswordReset;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Mail;
 
 class Operator extends Authenticatable implements JWTSubject
 {
@@ -59,6 +61,7 @@ class Operator extends Authenticatable implements JWTSubject
 
     public function sendPasswordResetNotification($token)
     {
-        $this->notify(new PasswordReset($token));
+        Mail::to($this->attributes['email'])
+        ->send(new OperatorAccountResetPassword ($token));
     }
 }

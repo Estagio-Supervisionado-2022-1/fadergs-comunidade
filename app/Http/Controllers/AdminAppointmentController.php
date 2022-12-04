@@ -162,7 +162,7 @@ class AdminAppointmentController extends Controller
                 return response()->json(['error' => 'Não é possível alterar o status'], 401);
             }
 
-            $appointment->update(['id' => $appointment->id], [
+            $appointment->update([
                 'status' => $request->status
             ]);
         }
@@ -183,7 +183,7 @@ class AdminAppointmentController extends Controller
                 return response()->json(['error' => 'Não é possível confirmar a presença, verifique se o usuário foi atendido'], 401);
             }
 
-            $appointment->update (['id' => $appointment->id], [
+            $appointment->update ([
                 'compareceu' => $request->compareceu
             ]);
 
@@ -201,7 +201,7 @@ class AdminAppointmentController extends Controller
                 return response()->json(['errors' => $validatorReturn->errors()], 400);
             }
 
-            $appointment->update (['id' => $appointment->id],[
+            $appointment->update ([
                 'room_id' => $request->room_id
             ]);
 
@@ -220,7 +220,7 @@ class AdminAppointmentController extends Controller
                 return response()->json(['errors' => $validatorReturn->errors()], 400);
             }
 
-            $appointment->update (['id' => $appointment->id], [
+            $appointment->update ([
                 'user_id' => $request->user_id
             ]);
         }
@@ -244,7 +244,7 @@ class AdminAppointmentController extends Controller
                 return response()->json(['errors' => 'Operador não tem o perfil correto para associação'], 400);
             }
 
-            $appointment->update(['id' => $appointment->id], [
+            $appointment->update([
                 'operator_id' => $request->operator_id
             ]);
         }
