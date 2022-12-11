@@ -58,6 +58,16 @@ class AppointmentData
     {
         $appointments = Appointment::get();
 
+         $appointments = Appointment::join('services', 'appointments.service_id', '=', 'services.id')
+            ->orderBy('datetime', 'desc')
+            ->get([
+                'appointments.id as id',
+                'appointments.compareceu as compareceu',
+                'appointments.status as appointment_status',
+                'appointments.datetime as appointment_datetime',
+                'services.name as service_name'
+            ]);
+
         return $appointments;
     }
 
